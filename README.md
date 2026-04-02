@@ -36,3 +36,15 @@ Need up-front, the necessary documentation to get myself going so I don't burn t
 - Agentic AI Architecture Guide - https://docs.cloud.google.com/architecture/agentic-ai-overview 
 - MCP Guide - https://modelcontextprotocol.io/docs/getting-started/intro 
 - Agentic AI Security - https://www.ibm.com/think/topics/ai-agent-security 
+
+
+# Installation
+
+```
+# Install setuptools
+pip install -r requirements
+
+# Install the all other requirements and our project in editable mode
+pip install -e .
+```
+
