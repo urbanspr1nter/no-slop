@@ -9,7 +9,7 @@ class ContextManager:
     def set_sys_prompt(self, sys_prompt):
         self._sys_prompt = sys_prompt
 
-    def build_context(self, prompt: str):
+    def build_context(self, prompt: str) -> list[dict]:
         turn = Turn(user_message=ChatMessage(role="user", content=prompt))
 
         self._turns.append(turn)
@@ -21,7 +21,8 @@ class ContextManager:
         for stored_turn in self._turns:
             result.extend(self._serialize_turn(stored_turn))
 
-        print(f"[DEBUG] - Context: {result}")
+        # print(f"[DEBUG] - Context: {result}")
+
         return result
 
     def add_assistant_response(self, response_text: str):
@@ -29,7 +30,7 @@ class ContextManager:
         latest_turn = self._turns[-1]
         latest_turn.assistant_message = message
 
-    def _serialize_turn(self, turn: Turn):
+    def _serialize_turn(self, turn: Turn) -> list[dict]:
         user_message = turn.user_message
         assistant_message = turn.assistant_message
 

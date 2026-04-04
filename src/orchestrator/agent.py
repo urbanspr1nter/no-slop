@@ -7,6 +7,9 @@ class Agent:
         self._context_manager = ContextManager()
         self._intelligence = Intelligence()
 
+    def set_system_prompt(self, sys_prompt: str):
+        self._context_manager.set_sys_prompt(sys_prompt)
+
     def step(self, message: str):
         context = self._context_manager.build_context(message)
         result = self._intelligence.send_message(context)
