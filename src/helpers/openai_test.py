@@ -1,125 +1,11 @@
 import openai
 import json
 import tools.ns_math as ns_math
+from tools.registry import MATH_TOOLS
 
 MODEL = "qwen3.5-0.8b"
 BASE_API_ENDPOINT = "http://127.0.0.1:8000/v1"
 API_KEY = "none"
-
-
-TOOLS = [
-    {
-        "type": "function",
-        "name": "sqrt",
-        "description": "Computes the square root of a given number.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The number you want to square root.",
-                }
-            },
-            "required": ["x"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "sum",
-        "description": "Computes the sum of 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "sub",
-        "description": "Computes the difference between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "mult",
-        "description": "Computes the product between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "div",
-        "description": "Computes the quotient between 2 numbers. Raises a ZeroDivisionError if attempting to divide by 0.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "pow",
-        "description": "Computes x raised to y power.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "mod",
-        "description": "Computes the modulo between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-]
 
 
 def send_message(prompt: str) -> str:
@@ -127,7 +13,7 @@ def send_message(prompt: str) -> str:
 
     context = [{"role": "user", "content": prompt}]
 
-    response = client.responses.create(model=MODEL, tools=TOOLS, input=context)
+    response = client.responses.create(model=MODEL, tools=MATH_TOOLS, input=context)
 
     while True:
         context.extend(response.output)
@@ -139,7 +25,14 @@ def send_message(prompt: str) -> str:
 
         for item in response.output:
             if item.type == "message":
-                return response.output_text
+                print(response.output_text)
+
+                filtered_len = len(
+                    list(filter(lambda x: x.type == "function_call", response.output))
+                )
+                if filtered_len == 0:
+                    return response.output_text
+
             elif item.type == "function_call":
                 args = json.loads(item.arguments)
 
@@ -185,8 +78,10 @@ def send_message(prompt: str) -> str:
 
                 # send back the result of the tool call back to LLM
                 response = client.responses.create(
-                    model=MODEL, tools=TOOLS, input=context
+                    model=MODEL, tools=MATH_TOOLS, input=context
                 )
+            elif item.type == "reasoning":
+                print("Reasoning")
             else:
                 raise ValueError("Unsupported response type.")
 
