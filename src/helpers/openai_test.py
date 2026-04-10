@@ -2,8 +2,9 @@ import openai
 import json
 import tools.ns_math as ns_math
 from tools.registry import MATH_TOOLS
+from tools.call_tool import call_tool
 
-MODEL = "qwen3.5-0.8b"
+MODEL = "qwen3.5-4b"
 BASE_API_ENDPOINT = "http://127.0.0.1:8000/v1"
 API_KEY = "none"
 
@@ -11,10 +12,17 @@ API_KEY = "none"
 def send_message(prompt: str) -> str:
     client = openai.Client(base_url=BASE_API_ENDPOINT, api_key=API_KEY)
 
-    context = [{"role": "user", "content": prompt}]
+    context = [
+        {
+            "role": "system",
+            "content": "You are a grandmaster in mathematics. If necessary, perform tool calsl step by step to solve the problem.",
+        },
+        {"role": "user", "content": prompt},
+    ]
 
     response = client.responses.create(model=MODEL, tools=MATH_TOOLS, input=context)
 
+    response_text = ""
     while True:
         context.extend(response.output)
 
@@ -23,50 +31,36 @@ def send_message(prompt: str) -> str:
         print(response.output)
         print()
 
+        is_tool_call = False
+
         for item in response.output:
+            if item.type == "function_call":
+                is_tool_call = True
+            else:
+                is_tool_call = False
+
             if item.type == "message":
-                print(response.output_text)
+                response_text = response.output_text
+            elif item.type == "reasoning":
+                content = item.summary if len(item.summary) > 0 else item.content
 
-                filtered_len = len(
-                    list(filter(lambda x: x.type == "function_call", response.output))
-                )
-                if filtered_len == 0:
-                    return response.output_text
+                reasoning = "<think>"
+                for block in content:
+                    reasoning += block.text
+                reasoning = reasoning.strip()
+                reasoning += "\n</think>"
 
+                print(reasoning)
             elif item.type == "function_call":
+                tool_name = item.name
                 args = json.loads(item.arguments)
 
-                result = {"status": "failure"}
+                tool_call_trace = (
+                    f"<tool>\nCalling tool: {tool_name}, args: {args}\n</tool>"
+                )
+                print(tool_call_trace)
 
-                if item.name == "sqrt":
-                    x = args["x"]
-                    result = {"status": "ok", "result": ns_math.sqrt(x)}
-                elif item.name == "sum":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.sum(x, y)}
-                elif item.name == "sub":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.sub(x, y)}
-                elif item.name == "mult":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.mult(x, y)}
-                elif item.name == "div":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.div(x, y)}
-                elif item.name == "pow":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.pow(x, y)}
-                elif item.name == "mod":
-                    x = args["x"]
-                    y = args["y"]
-                    result = {"status": "ok", "result": ns_math.pow(x, y)}
-                else:
-                    result = {"status": "failure"}
+                result = call_tool(tool_name, args)
 
                 context.append(
                     {
@@ -80,16 +74,20 @@ def send_message(prompt: str) -> str:
                 response = client.responses.create(
                     model=MODEL, tools=MATH_TOOLS, input=context
                 )
-            elif item.type == "reasoning":
-                print("Reasoning")
+
             else:
                 raise ValueError("Unsupported response type.")
+
+        if not is_tool_call:
+            break
+
+    return response_text
 
 
 if __name__ == "__main__":
 
     result = send_message(
-        "square root of 121, then cube-root that and add 76 to it and finally divide by 13."
+        "start with 2342345, divide by 0.45, multiply by 10, then take the fifth root, raise to the 4th power and modulo 3 and finally output with 'cat' prefixed to the result."
     )
 
     print(result)
