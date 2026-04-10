@@ -1,12 +1,10 @@
 from openai.types.responses.response_output_item import ResponseOutputItem
-from tools.registry import MATH_TOOLS
 
 
 class ContextManager:
     def __init__(self):
         self._sys_prompt = "You are a helpful assistant."
         self._context: list = [{"role": "system", "content": self._sys_prompt}]
-        self._tools: list = MATH_TOOLS
 
     def get_context(self):
         return self._context

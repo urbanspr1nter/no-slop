@@ -1,4 +1,5 @@
 import tools.ns_math as ns_math
+import tools.fs as fs
 
 
 def call_tool(tool_name: str, args: dict):
@@ -31,6 +32,32 @@ def call_tool(tool_name: str, args: dict):
         x = args["x"]
         y = args["y"]
         result = {"status": "ok", "result": ns_math.mod(x, y)}
+    elif tool_name == "write_file":
+        filepath = args["filepath"]
+        content = args["content"]
+        mode = args.get("mode", "w")
+
+        result = fs.fs_write_file(filepath, content, mode)
+    elif tool_name == "read_file":
+        filepath = args["filepath"]
+        mode = args.get("mode", "r")
+
+        result = fs.fs_read_file(filepath, mode)
+    elif tool_name == "make_directory":
+        filepath = args["filepath"]
+        create_parent_if_not_exists = args.get("create_parent_if_not_exists", False)
+
+        result = fs.fs_make_directory(filepath, create_parent_if_not_exists)
+    elif tool_name == "list_directory":
+        filepath = args["filepath"]
+
+        result = fs.fs_list_directory(filepath)
+    elif tool_name == "file_exists":
+        filepath = args["filepath"]
+
+        result = fs.fs_file_exists(filepath)
+    elif tool_name == "get_root_dir":
+        result = fs.fs_get_root_dir()
     else:
         result = {"status": "failure"}
 
