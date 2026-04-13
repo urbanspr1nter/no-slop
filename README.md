@@ -37,6 +37,10 @@ Need up-front, the necessary documentation to get myself going so I don't burn t
 - MCP Guide - https://modelcontextprotocol.io/docs/getting-started/intro 
 - Agentic AI Security - https://www.ibm.com/think/topics/ai-agent-security 
 
+## Textual
+- Textual Tutorials - https://textual.textualize.io/tutorial/
+
+
 
 # Installation
 
