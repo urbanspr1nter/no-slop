@@ -39,7 +39,7 @@ Need up-front, the necessary documentation to get myself going so I don't burn t
 
 ## Textual
 - Textual Tutorials - https://textual.textualize.io/tutorial/
-
+- Textual App Class - https://textual.textualize.io/guide/app/ 
 
 
 # Installation
