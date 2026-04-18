@@ -7,9 +7,10 @@ class Shell(App):
     TITLE = "no-slop"
     SUB_TITLE = "AI Coding Agent Programmed Without AI"
 
+    CSS_PATH = "textual_shell.tcss"
+
     def on_mount(self) -> None:
-        self.screen.styles.background = "purple"
-        self.screen.styles.color = "white"
+        pass
 
     def compose(self) -> ComposeResult:
         yield Header()

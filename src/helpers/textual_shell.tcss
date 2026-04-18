@@ -1,0 +1,10 @@
+Screen {
+    background: #000048;
+    border: thick ivory;
+    color: ivory;
+}
+
+Header {
+    margin: 0;
+    padding: 0;
+}
