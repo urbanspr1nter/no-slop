@@ -211,6 +211,39 @@ MATH_TOOLS = [
     },
 ]
 
+SHELL_TOOLS = [
+    {
+        "type": "function",
+        "name": "shell_exec_sync",
+        "description": 'Run a shell command synchronously. Parameters are "program" (string) and "arguments" (array). Example: program="ls" arguments=["-la", "/etc"]',
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "program": {
+                    "type": "string",
+                    "description": "Program or builtin to run.",
+                },
+                "arguments": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of arguments including switches/options.",
+                },
+                "env": {
+                    "type": "object",
+                    "additionalProperties": {"type": "string"},
+                    "description": "Environment variables to set (key-value pairs). OS environment will be extended with this.",
+                },
+                "timeout": {
+                    "type": "number",
+                    "description": "Maximum number of seconds to execute the shell command. Default=120 seconds if not provided.",
+                },
+            },
+            "required": ["program"],
+        },
+    }
+]
+
 TOOL_SET = []
 TOOL_SET.extend(FILE_SYSTEM_TOOLS)
 TOOL_SET.extend(MATH_TOOLS)
+TOOL_SET.extend(SHELL_TOOLS)

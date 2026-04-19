@@ -1,5 +1,6 @@
 import tools.ns_math as ns_math
 import tools.fs as fs
+import tools.shell as shell
 
 
 def call_tool(tool_name: str, args: dict):
@@ -58,6 +59,13 @@ def call_tool(tool_name: str, args: dict):
         result = fs.fs_file_exists(filepath)
     elif tool_name == "get_root_dir":
         result = fs.fs_get_root_dir()
+    elif tool_name == "shell_exec_sync":
+        result = shell.shell_exec_sync(
+            program=args.get("program", ""),
+            arguments=args.get("arguments", []),
+            env=args.get("env", {}),
+            timeout=args.get("timeout", 120),
+        )
     else:
         result = {"status": "failure"}
 
