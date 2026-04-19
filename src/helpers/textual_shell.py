@@ -1,6 +1,6 @@
 from textual.app import App, ComposeResult
 from textual import events
-from textual.widgets import Header, Footer
+from textual.widgets import Header, Footer, Static
 
 
 class Shell(App):
@@ -13,7 +13,15 @@ class Shell(App):
         pass
 
     def compose(self) -> ComposeResult:
+        input_field_widget = Static(
+            "type something here!",
+            classes="input-field",
+        )
+        input_field_widget.styles.layout = "vertical"
+
         yield Header()
+        yield Static("MessagePane", classes="message-pane")
+        yield input_field_widget
         yield Footer()
 
 

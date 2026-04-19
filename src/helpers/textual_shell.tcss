@@ -2,9 +2,28 @@ Screen {
     background: #000048;
     border: thick ivory;
     color: ivory;
+    layout: vertical;
 }
 
 Header {
     margin: 0;
+    padding: 0;
+}
+
+.message-pane {
+    margin: 1;
+    background: #000000;
+    border: ivory;
+    height: 3fr;
+    padding: 0;
+}
+
+.input-field {
+    margin: 1;
+    dock: bottom;
+    height: 50%;
+    background: ivory;
+    color: black;
+    border: goldenrod;
     padding: 0;
 }
