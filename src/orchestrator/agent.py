@@ -2,12 +2,13 @@ import json
 from context_management.context_manager import ContextManager
 from intelligence_layer.intelligence import Intelligence
 from tools.call_tool import call_tool
+from config.loader import Config
 
 
 class Agent:
-    def __init__(self):
+    def __init__(self, config: Config):
         self._context_manager = ContextManager()
-        self._intelligence = Intelligence()
+        self._intelligence = Intelligence(config)
 
     def set_system_prompt(self, sys_prompt: str):
         self._context_manager.set_sys_prompt(sys_prompt)
