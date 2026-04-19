@@ -1,7 +1,13 @@
 import json
 import os
+from pathlib import Path
 
-SANDBOX_ROOT = "/home/avgdev/sandbox"
+HOME_DIRECTORY = str(Path.home())
+
+BLOCKED_PATHS = [
+    f"{HOME_DIRECTORY}/.bashrc",
+    f"{HOME_DIRECTORY}.bash_profile",
+]
 
 WRITE_MODE_SET = {"r", "w", "x", "a", "t", "+"}
 READ_MODE_SET = {"r", "w", "x", "a", "b", "t", "+"}
@@ -25,36 +31,31 @@ def _sanitize_mode(mode: str, is_write: bool = False):
     return result
 
 
-def _make_real_path(filepath: str) -> str:
-    real_path = SANDBOX_ROOT
-
-    if not filepath.startswith(SANDBOX_ROOT):
-        real_path = f"{SANDBOX_ROOT}/{filepath}"
+def _is_blocked_path(filepath: str) -> bool:
+    if filepath.strip() in BLOCKED_PATHS:
+        return True
     else:
-        real_path = filepath
+        return False
+
+
+def _make_real_path(filepath: str) -> str:
+    real_path = str(Path(filepath).resolve())
 
     return real_path
 
 
 def fs_write_file(filepath: str, content: str, mode: str = "w") -> str:
-    """Writes a file with contents given a filepath within the sandbox directory.
-
-    File path is something like: {sandbox_root}/{filepath}. If no sandbox root is prepended, it will be done so automatically. To find the sandbox directory, run the "get_root_dir" function.
+    """Writes a file with contents given a filepath.
 
     Default mode is w (write).
 
     Returns
         - Information about the number of bytes written.
     """
-    if _is_parent_traversal(filepath):
-        return json.dumps(
-            {
-                "status": "error",
-                "result": "Parent traversals not allowed. Please provide absolute directory.",
-            }
-        )
-
     real_path = _make_real_path(filepath)
+
+    if _is_blocked_path(real_path):
+        return {"status": "failure", "message": f"{real_path} is not allowed."}
 
     bytes_written = 0
     try:
@@ -69,23 +70,17 @@ def fs_write_file(filepath: str, content: str, mode: str = "w") -> str:
 
 
 def fs_read_file(filepath: str, mode: str = "r") -> str:
-    """Reads a file and gets contents as a string given the filepath within the sandbox root.
-
-    File path is something like: {sandbox_root}/{filepath}. If no sandbox root is prepended, it will be done so automatically. To find the sandbox directory, run the "get_root_dir" function.
+    """Reads a file and gets contents as a string given a filepath.
 
     Default mode is "r" (read).
 
     Returns:
         - Information including contents of the file at given filepath.
     """
-    if _is_parent_traversal(filepath):
-        return json.dumps(
-            {
-                "status": "error",
-                "result": "Parent traversals not allowed. Please provide absolute directory.",
-            }
-        )
     real_path = _make_real_path(filepath)
+
+    if _is_blocked_path(real_path):
+        return {"status": "failure", "message": f"{real_path} is not allowed."}
 
     content = ""
     try:
@@ -100,21 +95,15 @@ def fs_read_file(filepath: str, mode: str = "r") -> str:
 
 
 def fs_make_directory(filepath: str, create_parent_if_not_exists: bool = False) -> str:
-    """Creates a directory at the filepath within the sandbox root.
-
-    File path is something like: {sandbox_root}/{filepath}. If no sandbox root is prepended, it will be done so automatically. To find the sandbox directory, run the "get_root_dir" function.
+    """Creates a directory at the filepath.
 
     Returns:
         - Information and filepath of the directory created.
     """
-    if _is_parent_traversal(filepath):
-        return json.dumps(
-            {
-                "status": "error",
-                "result": "Parent traversals not allowed. Please provide absolute directory.",
-            }
-        )
     real_path = _make_real_path(filepath)
+
+    if _is_blocked_path(real_path):
+        return {"status": "failure", "message": f"{real_path} is not allowed."}
 
     try:
         if create_parent_if_not_exists:
@@ -132,21 +121,15 @@ def fs_make_directory(filepath: str, create_parent_if_not_exists: bool = False) 
 
 
 def fs_list_directory(filepath: str) -> str:
-    """Gets the filenames at the current directory specified by the filepath within the sandbox root.
-
-    File path is something like: {sandbox_root}/{filepath}. If no sandbox root is prepended, it will be done so automatically. To find the sandbox directory, run the "get_root_dir" function.
+    """Gets the filenames at associated within the path.
 
     Returns:
-        - Information about the list of filenames at the current directory.
+        - Information about the list of filenames within the path.
     """
-    if _is_parent_traversal(filepath):
-        return json.dumps(
-            {
-                "status": "error",
-                "result": "Parent traversals not allowed. Please provide absolute directory.",
-            }
-        )
     real_path = _make_real_path(filepath)
+
+    if _is_blocked_path(real_path):
+        return {"status": "failure", "message": f"{real_path} is not allowed."}
 
     if not os.path.exists(real_path):
         return json.dumps(
@@ -160,31 +143,18 @@ def fs_list_directory(filepath: str) -> str:
 
 
 def fs_file_exists(filepath: str) -> str:
-    """Checks if the file exists specified by the filepath within the sandbox root.
-
-    File path is something like: {sandbox_root}/{filepath}. If no sandbox root is prepended, it will be done so automatically. To find the sandbox directory, run the "get_root_dir" function.
+    """Checks if the file exists specified by the filepath.
 
     Returns:
         - Information if the file exists.
     """
-    if _is_parent_traversal(filepath):
-        return json.dumps(
-            {
-                "status": "error",
-                "result": "Parent traversals not allowed. Please provide absolute directory.",
-            }
-        )
+    real_path = _make_real_path(filepath)
+
+    if _is_blocked_path(real_path):
+        return {"status": "failure", "message": f"{real_path} is not allowed."}
+
     real_path = _make_real_path(filepath)
 
     result = os.path.exists(real_path)
 
     return json.dumps({"status": "ok", "result": result})
-
-
-def fs_get_root_dir() -> str:
-    """Gets the filepath to the sandbox root.
-
-    Returns:
-        - The path of the sandbox root.
-    """
-    return json.dumps({"status": "ok", "result": SANDBOX_ROOT})
