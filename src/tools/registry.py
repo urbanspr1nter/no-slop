@@ -2,13 +2,13 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "write_file",
-        "description": "Writes a file with contents given a filepath within the sandbox directory.",
+        "description": "Writes a file with contents given a filepath.",
         "parameters": {
             "type": "object",
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath relative to the sandbox root. If no sandbox root is prepended, it will be done so automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically.",
                 },
                 "content": {
                     "type": "string",
@@ -25,13 +25,13 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "read_file",
-        "description": "Reads a file and gets contents as a string given the filepath within the sandbox root.",
+        "description": "Reads a file and gets contents as a string given the filepath.",
         "parameters": {
             "type": "object",
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath relative to the sandbox root. If no sandbox root is prepended, it will be done so automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically.",
                 },
                 "mode": {
                     "type": "string",
@@ -44,13 +44,13 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "make_directory",
-        "description": "Creates a directory at the filepath within the sandbox root.",
+        "description": "Creates a directory at the filepath.",
         "parameters": {
             "type": "object",
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath relative to the sandbox root. If no sandbox root is prepended, it will be done so automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically.",
                 },
                 "create_parent_if_not_exists": {
                     "type": "boolean",
@@ -63,13 +63,13 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "list_directory",
-        "description": "Gets the filenames at the current directory specified by the filepath within the sandbox root.",
+        "description": "Gets the filenames at the current directory specified by the filepath.",
         "parameters": {
             "type": "object",
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath relative to the sandbox root. If no sandbox root is prepended, it will be done so automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically.",
                 }
             },
             "required": ["filepath"],
@@ -78,22 +78,17 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "file_exists",
-        "description": "Checks if the file exists specified by the filepath within the sandbox root.",
+        "description": "Checks if the file exists specified by the filepath.",
         "parameters": {
             "type": "object",
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath relative to the sandbox root. If no sandbox root is prepended, it will be done so automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically.",
                 }
             },
             "required": ["filepath"],
         },
-    },
-    {
-        "type": "function",
-        "name": "get_root_dir",
-        "description": "Gets the filepath to the sandbox root.",
     },
 ]
 

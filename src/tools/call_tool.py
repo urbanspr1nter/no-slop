@@ -57,8 +57,6 @@ def call_tool(tool_name: str, args: dict):
         filepath = args["filepath"]
 
         result = fs.fs_file_exists(filepath)
-    elif tool_name == "get_root_dir":
-        result = fs.fs_get_root_dir()
     elif tool_name == "shell_exec_sync":
         result = shell.shell_exec_sync(
             program=args.get("program", ""),
