@@ -1,7 +1,9 @@
 from orchestrator.agent import Agent
+from config.loader import load_config, Config
 
 if __name__ == "__main__":
-    agent = Agent()
+    config: Config = load_config()
+    agent = Agent(config=config)
 
     agent.set_system_prompt("You are a helpful assistant. Keep your responses concise.")
 

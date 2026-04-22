@@ -1,16 +1,15 @@
 import openai
 from openai.types.responses.response_output_item import ResponseOutputItem
 from tools.registry import TOOL_SET
-
-MODEL = "qwen3.5-4b"
-BASE_API_ENDPOINT = "http://127.0.0.1:8000/v1"
-API_KEY = "none"
+from intelligence_layer.llm_provider import LlmProvider
 
 
-def send(context: list) -> list[ResponseOutputItem]:
-    client = openai.Client(base_url=BASE_API_ENDPOINT, api_key=API_KEY)
+def send(provider: LlmProvider, context: list) -> list[ResponseOutputItem]:
+    client = openai.Client(base_url=provider.base_endpoint, api_key=provider.api_key)
 
-    response = client.responses.create(model=MODEL, input=context, tools=TOOL_SET)
+    response = client.responses.create(
+        model=provider.model_id, input=context, tools=TOOL_SET
+    )
 
     if response.status == "failed":
         raise ValueError("Cannot complete the request.")
