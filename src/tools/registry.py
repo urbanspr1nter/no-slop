@@ -238,7 +238,35 @@ SHELL_TOOLS = [
     }
 ]
 
+
+EDITING_TOOLS = [
+    {
+        "type": "function",
+        "name": "file_edit_and_show_diff",
+        "description": "Edits a file on disk given the string to replace with the new string. Returns a diff of edits after the process is done.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "old_str": {
+                    "type": "string",
+                    "description": "String to search for in the file to be replaced for edit.",
+                },
+                "new_str": {
+                    "type": "string",
+                    "description": "String to replace the old_str.",
+                },
+                "filepath": {
+                    "type": "string",
+                    "description": "Filepath of the file to edit.",
+                },
+            },
+            "required": ["old_str", "new_str", "filepath"],
+        },
+    }
+]
+
 TOOL_SET = []
 TOOL_SET.extend(FILE_SYSTEM_TOOLS)
 TOOL_SET.extend(MATH_TOOLS)
 TOOL_SET.extend(SHELL_TOOLS)
+TOOL_SET.extend(EDITING_TOOLS)

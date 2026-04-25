@@ -1,6 +1,7 @@
 import tools.ns_math as ns_math
 import tools.fs as fs
 import tools.shell as shell
+import tools.file_edit_and_show_diff as edit
 
 
 def call_tool(tool_name: str, args: dict):
@@ -63,6 +64,12 @@ def call_tool(tool_name: str, args: dict):
             arguments=args.get("arguments", []),
             env=args.get("env", {}),
             timeout=args.get("timeout", 120),
+        )
+    elif tool_name == "file_edit_and_show_diff":
+        result = edit.file_edit_and_show_diff(
+            old_str=args.get("old_str", ""),
+            new_str=args.get("new_str", ""),
+            filepath=args.get("filepath", ""),
         )
     else:
         result = {"status": "failure"}
