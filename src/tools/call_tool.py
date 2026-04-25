@@ -2,6 +2,7 @@ import tools.ns_math as ns_math
 import tools.fs as fs
 import tools.shell as shell
 import tools.file_edit_and_show_diff as edit
+import tools.glob as glob
 
 
 def call_tool(tool_name: str, args: dict):
@@ -58,6 +59,12 @@ def call_tool(tool_name: str, args: dict):
         filepath = args["filepath"]
 
         result = fs.fs_file_exists(filepath)
+    elif tool_name == "glob":
+        result = glob.glob(
+            start_path=args.get("start_path", ""),
+            glob_path=args.get("glob_path", ""),
+            recurse=args.get("recurse", False),
+        )
     elif tool_name == "shell_exec_sync":
         result = shell.shell_exec_sync(
             program=args.get("program", ""),

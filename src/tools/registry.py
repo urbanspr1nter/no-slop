@@ -90,6 +90,23 @@ FILE_SYSTEM_TOOLS = [
             "required": ["filepath"],
         },
     },
+    {
+        "type": "function",
+        "name": "glob",
+        "description": "Perform glob path search at the start path.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "start_path": {
+                    "type": "string",
+                    "description": "Start path which will resolve to the absolute path to begin glob search",
+                },
+                "glob_path": {"type": "string", "description": "glob path"},
+                "recurse": {"type": "boolean", "description": "Recurse search"},
+            },
+            "required": ["start_path", "glob_path"],
+        },
+    },
 ]
 
 MATH_TOOLS = [

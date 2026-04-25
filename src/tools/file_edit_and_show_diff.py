@@ -3,6 +3,10 @@ import os
 
 
 def file_edit_and_show_diff(old_str: str, new_str: str, filepath: str):
+    """Edits the file where `old_str` occurs and replaces with `new_str`.
+
+    Resulting diff will be returned after the file has been edited.
+    """
     if not os.path.exists(filepath):
         return {"status": "failure", "message": f"File: {filepath} does not exist."}
 
