@@ -38,7 +38,7 @@ def _sanitize_mode(mode: str, is_write: bool = False):
 
 
 def _make_real_path(filepath: str) -> str:
-    real_path = str(Path(filepath).resolve())
+    real_path = str(Path(filepath).expanduser().resolve())
 
     return real_path
 

@@ -1,0 +1,18 @@
+I am an aspiring Software Engineer.
+I have a little bit of work experience as an intern at BigFinance Company. About 2 years from 2020-2022.
+It is now 2023, and I am out of school. I am looking for a new job as a Junior developer. I am a full-stack developer.
+I know NodeJS, SQL and Python. 
+
+# Task
+
+Help me create a beautiful resume in HTML/CSS/JS (in one file) that I can use as a template to fill in additional information and put it online to show to recruiters.
+
+Ensure the resume has sections:
+1. placeholder photo
+2. education at Fancy University with a B.Sc in Computer Science
+3. technicial skills
+4. projects
+5. work experience
+6. IMPORTANT: A little something extra to help me stand out as a candidate.
+
+Create my resume in this path: /home/avgdev/sandbox/resume_L0_a.html

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junior Full-Stack Developer Resume</title>
+    <style>
+        /* General Reset and Typography */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .resume-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+        }
+        h1, h2 {
+            color: #007bff; /* Primary blue color */
+            margin-top: 0;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        p {
+            margin: 5px 0;
+        }
+
+        /* Header and Profile Section */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 30px;
+            border: 4px solid #007bff;
+        }
+        .personal-info h1 {
+            font-size: 2.2em;
+            margin: 0;
+            color: #222;
+        }
+        .personal-info p {
+            margin: 5px 0 0;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* Sections Layout */
+        .section-content {
+            display: flex;
+            gap: 40px;
+        }
+        .main-content, .sidebar {
+            flex: 1;
+        }
+        .sidebar {
+            flex: 0 0 30%; /* Make sidebar about 30% wide */
+            padding-left: 20px;
+            border-left: 1px solid #eee;
+        }
+
+        /* Experience and Education Styling */
+        .job-entry, .education-entry {
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid #007bff;
+        }
+        .job-entry h3, .education-entry h3 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #007bff;
+        }
+        .job-entry span, .education-entry span {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+        }
+        ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Skills Section */
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .skill-tag {
+            background-color: #e9ecef;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Projects Section */
+        .project-item {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 15px;
+        }
+        .project-item h4 {
+            color: #333;
+            margin-top: 0;
+        }
+        .project-links a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        /* Standout Section Styling */
+        .extra-section {
+            background-color: #eef4ff; /* Light blue background */
+            border: 1px solid #007bff;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+        .extra-section h2 {
+            color: #0056b3;
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+
+        <!-- Header / Profile -->
+        <div class="header">
+            <img src="placeholder_photo.jpg" alt="[Your Photo Here]" class="profile-photo">
+            <div class="personal-info">
+                <h1>[Your Full Name]</h1>
+                <p>Junior Full-Stack Developer</p>
+                <p>[Phone Number] | [Email Address] | [LinkedIn Profile] | [GitHub Profile]</p>
+            </div>
+        </div>
+
+        <!-- Main Content Layout -->
+        <div class="section-content">
+            
+            <!-- Left Column: Experience, Education, Projects -->
+            <div class="main-content">
+
+                <!-- Work Experience -->
+                <h2>💼 Work Experience</h2>
+                <div class="job-entry">
+                    <h3>Intern Developer | BigFinance Company</h3>
+                    <span>2020 – 2022</span>
+                    <ul>
+                        <li>Assisted in the development and maintenance of core financial applications using NodeJS and SQL backend services.</li>
+                        <li>Contributed to feature implementation, focusing on API design and database optimization to improve performance by [X]%.</li>
+                        <li>Participated in Agile sprints, collaborating with senior developers to deliver high-quality, tested features.</li>
+                        <li>[Add specific achievement or technology used here].</li>
+                    </ul>
+                </div>
+
+                <!-- Projects -->
+                <h2>💡 Projects</h2>
+                <div class="project-item">
+                    <h4>[Project Name 1]</h4>
+                    <p>A full-stack application built using NodeJS, Express, and a [Database Type] backend. Features include user authentication and real-time data visualization.</p>
+                    <div class="project-links">
+                        <a href="[GitHub Link]">Code</a> | <a href="[Live Demo Link]">Demo</a>
+                    </div>
+                </div>
+                <div class="project-item">
+                    <h4>[Project Name 2]</h4>
+                    <p>A Python-based data analysis tool that scrapes and processes data from external APIs. Demonstrates proficiency in data structures and algorithmic thinking.</p>
+                    <div class="project-links">
+                        <a href="[GitHub Link]">Code</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Skills, Education, Extra -->
+            <div class="sidebar">
+                
+                <!-- Technical Skills -->
+                <h2>💻 Technical Skills</h2>
+                <div class="skill-list">
+                    <span class="skill-tag">Node.js</span>
+                    <span class="skill-tag">SQL (PostgreSQL/MySQL)</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">HTML/CSS/JS</span>
+                    <span class="skill-tag">React/Vue (Optional)</span>
+                    <span class="skill-tag">Git/GitHub</span>
+                    <span class="skill-tag">[Other Skill]</span>
+                </div>
+
+                <!-- Education -->
+                <h2>🎓 Education</h2>
+                <div class="education-entry">
+                    <h3>B.Sc in Computer Science</h3>
+                    <span>Fancy University</span>
+                    <span>[Graduation Year, e.g., 2023]</span>
+                    <p>Relevant Coursework: Data Structures & Algorithms, Database Systems, Web Development, Operating Systems.</p>
+                </div>
+                
+                <!-- Standout Section -->
+                <div class="extra-section">
+                    <h2>🌟 Beyond the Code</h2>
+                    <p><strong>Problem Solving Philosophy:</strong> I approach technical challenges with a focus on elegant, maintainable solutions. I thrive in environments where complex problems require both creativity and logical rigor.</p>
+                    <p><strong>Continuous Learner:</strong> Currently exploring [New Technology, e.g., Docker or Kubernetes] to enhance deployment skills.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

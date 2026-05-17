@@ -1,0 +1,66 @@
+? /prompt /home/avgdev/code/no-slop/examples/evals/L0-basic-resume.txt
+<think>
+The user wants me to create a complete resume template in a single HTML file (`resume_L0_a.html`).
+The resume should be for a Junior Developer role, a full-stack developer, and include specific sections:
+1. Placeholder photo.
+2. Education (Fancy University, B.Sc in Computer Science).
+3. Technical skills (NodeJS, SQL, Python).
+4. Projects.
+5. Work Experience (BigFinance Company, Intern, 2020-2022).
+6. A standout "extra" section.
+
+I need to use HTML, CSS, and potentially a small amount of JavaScript for presentation (though CSS should handle most of the "beautiful" aspect).
+
+I will structure the HTML, inject CSS within `<style>` tags for a single-file solution, and populate the required sections with placeholder content based on the user's input.
+
+The target file path is `/home/avgdev/sandbox/resume_L0_a.html`.
+
+I will use the `write_file` tool to create this file.
+
+Plan:
+1.  Construct the full HTML/CSS/JS content.
+2.  Call `write_file` with the content and the specified path.
+
+Constraint Checklist & Confidence Score:
+1. Create a beautiful resume: Yes (Using CSS).
+2. HTML/CSS/JS in one file: Yes (CSS in `<style>`, JS if needed).
+3. Template to fill in: Yes (Using placeholder text).
+4. Put online/show recruiters: Yes (The output will be a usable HTML file).
+5. Section 1: Placeholder photo: Yes.
+6. Section 2: Education (Fancy University, B.Sc CS): Yes.
+7. Section 3: Technical skills (NodeJS, SQL, Python): Yes.
+8. Section 4: Projects: Yes.
+9. Section 5: Work experience (BigFinance, Intern, 2020-2022): Yes.
+10. Section 6: Something extra: Yes (e.g., "Interests" or "Personal Philosophy").
+11. Target path: `/home/avgdev/sandbox/resume_L0_a.html`: Yes.
+
+Confidence Score: 5/5
+
+Mental Sandbox:
+*   *Structure:* Standard HTML5 boilerplate.
+*   *Styling:* Use CSS Grid/Flexbox for layout, professional colors, good typography.
+*   *Content:* Fill in the user's specific details (BigFinance, Fancy University, NodeJS, etc.) and use clear placeholders for the rest (Projects, specific achievements).
+*   *Tool Usage:* `write_file` is the correct tool.
+
+Execution: Generate the HTML content and call `write_file`.
+</think>
+<tool>
+name= write_file, args={'content': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Junior Full-Stack Developer Resume</title>\n    <style>\n        /* General Reset and Typography */\n        body {\n            font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            background-color: #f4f4f9;\n            margin: 0;\n            padding: 0;\n        }\n        .resume-container {\n            max-width: 1000px;\n            margin: 40px auto;\n            background: #ffffff;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);\n            padding: 50px;\n        }\n        h1, h2 {\n            color: #007bff; /* Primary blue color */\n            margin-top: 0;\n        }\n        h2 {\n            border-bottom: 2px solid #eee;\n            padding-bottom: 5px;\n            margin-top: 30px;\n        }\n        p {\n            margin: 5px 0;\n        }\n\n        /* Header and Profile Section */\n        .header {\n            display: flex;\n            align-items: center;\n            margin-bottom: 30px;\n            border-bottom: 1px solid #ddd;\n            padding-bottom: 20px;\n        }\n        .profile-photo {\n            width: 120px;\n            height: 120px;\n            border-radius: 50%;\n            object-fit: cover;\n            margin-right: 30px;\n            border: 4px solid #007bff;\n        }\n        .personal-info h1 {\n            font-size: 2.2em;\n            margin: 0;\n            color: #222;\n        }\n        .personal-info p {\n            margin: 5px 0 0;\n            font-size: 1.1em;\n            color: #666;\n        }\n\n        /* Sections Layout */\n        .section-content {\n            display: flex;\n            gap: 40px;\n        }\n        .main-content, .sidebar {\n            flex: 1;\n        }\n        .sidebar {\n            flex: 0 0 30%; /* Make sidebar about 30% wide */\n            padding-left: 20px;\n            border-left: 1px solid #eee;\n        }\n\n        /* Experience and Education Styling */\n        .job-entry, .education-entry {\n            margin-bottom: 20px;\n            padding-left: 15px;\n            border-left: 3px solid #007bff;\n        }\n        .job-entry h3, .education-entry h3 {\n            margin: 0;\n            font-size: 1.3em;\n            color: #007bff;\n        }\n        .job-entry span, .education-entry span {\n            display: block;\n            font-size: 0.9em;\n            color: #666;\n        }\n        ul {\n            list-style: disc;\n            margin-left: 20px;\n        }\n        ul li {\n            margin-bottom: 8px;\n        }\n\n        /* Skills Section */\n        .skill-list {\n            display: flex;\n            flex-wrap: wrap;\n            gap: 10px;\n        }\n        .skill-tag {\n            background-color: #e9ecef;\n            padding: 6px 12px;\n            border-radius: 20px;\n            font-size: 0.9em;\n            font-weight: 500;\n        }\n\n        /* Projects Section */\n        .project-item {\n            margin-bottom: 20px;\n            border-bottom: 1px dashed #ddd;\n            padding-bottom: 15px;\n        }\n        .project-item h4 {\n            color: #333;\n            margin-top: 0;\n        }\n        .project-links a {\n            color: #007bff;\n            text-decoration: none;\n        }\n\n        /* Standout Section Styling */\n        .extra-section {\n            background-color: #eef4ff; /* Light blue background */\n            border: 1px solid #007bff;\n            padding: 20px;\n            margin-top: 30px;\n            border-radius: 8px;\n        }\n        .extra-section h2 {\n            color: #0056b3;\n            border-bottom: none;\n        }\n    </style>\n</head>\n<body>\n    <div class="resume-container">\n\n        <!-- Header / Profile -->\n        <div class="header">\n            <img src="placeholder_photo.jpg" alt="[Your Photo Here]" class="profile-photo">\n            <div class="personal-info">\n                <h1>[Your Full Name]</h1>\n                <p>Junior Full-Stack Developer</p>\n                <p>[Phone Number] | [Email Address] | [LinkedIn Profile] | [GitHub Profile]</p>\n            </div>\n        </div>\n\n        <!-- Main Content Layout -->\n        <div class="section-content">\n            \n            <!-- Left Column: Experience, Education, Projects -->\n            <div class="main-content">\n\n                <!-- Work Experience -->\n                <h2>💼 Work Experience</h2>\n                <div class="job-entry">\n                    <h3>Intern Developer | BigFinance Company</h3>\n                    <span>2020 – 2022</span>\n                    <ul>\n                        <li>Assisted in the development and maintenance of core financial applications using NodeJS and SQL backend services.</li>\n                        <li>Contributed to feature implementation, focusing on API design and database optimization to improve performance by [X]%.</li>\n                        <li>Participated in Agile sprints, collaborating with senior developers to deliver high-quality, tested features.</li>\n                        <li>[Add specific achievement or technology used here].</li>\n                    </ul>\n                </div>\n\n                <!-- Projects -->\n                <h2>💡 Projects</h2>\n                <div class="project-item">\n                    <h4>[Project Name 1]</h4>\n                    <p>A full-stack application built using NodeJS, Express, and a [Database Type] backend. Features include user authentication and real-time data visualization.</p>\n                    <div class="project-links">\n                        <a href="[GitHub Link]">Code</a> | <a href="[Live Demo Link]">Demo</a>\n                    </div>\n                </div>\n                <div class="project-item">\n                    <h4>[Project Name 2]</h4>\n                    <p>A Python-based data analysis tool that scrapes and processes data from external APIs. Demonstrates proficiency in data structures and algorithmic thinking.</p>\n                    <div class="project-links">\n                        <a href="[GitHub Link]">Code</a>\n                    </div>\n                </div>\n\n            </div>\n\n            <!-- Right Column: Skills, Education, Extra -->\n            <div class="sidebar">\n                \n                <!-- Technical Skills -->\n                <h2>💻 Technical Skills</h2>\n                <div class="skill-list">\n                    <span class="skill-tag">Node.js</span>\n                    <span class="skill-tag">SQL (PostgreSQL/MySQL)</span>\n                    <span class="skill-tag">Python</span>\n                    <span class="skill-tag">HTML/CSS/JS</span>\n                    <span class="skill-tag">React/Vue (Optional)</span>\n                    <span class="skill-tag">Git/GitHub</span>\n                    <span class="skill-tag">[Other Skill]</span>\n                </div>\n\n                <!-- Education -->\n                <h2>🎓 Education</h2>\n                <div class="education-entry">\n                    <h3>B.Sc in Computer Science</h3>\n                    <span>Fancy University</span>\n                    <span>[Graduation Year, e.g., 2023]</span>\n                    <p>Relevant Coursework: Data Structures & Algorithms, Database Systems, Web Development, Operating Systems.</p>\n                </div>\n                \n                <!-- Standout Section -->\n                <div class="extra-section">\n                    <h2>🌟 Beyond the Code</h2>\n                    <p><strong>Problem Solving Philosophy:</strong> I approach technical challenges with a focus on elegant, maintainable solutions. I thrive in environments where complex problems require both creativity and logical rigor.</p>\n                    <p><strong>Continuous Learner:</strong> Currently exploring [New Technology, e.g., Docker or Kubernetes] to enhance deployment skills.</p>\n                </div>\n            </div>\n        </div>\n\n    </div>\n</body>\n</html>', 'filepath': '/home/avgdev/sandbox/resume_L0_a.html'}
+</tool>
+I have created your resume template as requested and saved it to `/home/avgdev/sandbox/resume_L0_a.html`.
+
+This file is a single HTML document containing the structure, styling (CSS), and placeholder content for your skills and experience.
+
+### Key Features of the Template:
+
+*   **Professional Design:** Uses modern CSS (Flexbox/Grid) for a clean, two-column layout.
+*   **Structured Sections:** Includes placeholders for Photo, Personal Info, Work Experience, Education, Projects, Technical Skills, and the standout section.
+*   **Standout Section ("Beyond the Code"):** This section is designed to help you stand out by giving a glimpse into your professional mindset (problem-solving philosophy, continuous learning).
+
+### Next Steps:
+
+1.  **Fill in the Blanks:** Open `resume_L0_a.html` in a text editor and replace all bracketed placeholders (`[Your Name]`, `[Project Name 1]`, `[X]`, etc.) with your actual information.
+2.  **Customize:** Adjust the CSS colors or fonts in the `<style>` block if you want a different visual style.
+3.  **Deployment:** Since this is a static HTML file, you can easily host it on platforms like GitHub Pages, Netlify, or Vercel to share it with recruiters.
+
+Good luck with your job search!
