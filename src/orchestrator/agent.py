@@ -13,10 +13,12 @@ class Agent:
     def set_system_prompt(self, sys_prompt: str):
         self._context_manager.set_sys_prompt(sys_prompt)
 
-    def step(self, message: str):
+    async def step(self, message: str):
         self._context_manager.build_context(message)
 
-        result = self._intelligence.send_message(self._context_manager.get_context())
+        result = await self._intelligence.send_message(
+            self._context_manager.get_context()
+        )
 
         response_text = ""
         while True:

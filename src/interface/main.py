@@ -1,11 +1,13 @@
 import os
+import asyncio
 import argparse
 from pathlib import Path
 
 from orchestrator.agent import Agent
 from config.loader import load_config, Config
 
-if __name__ == "__main__":
+
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--system-prompt")
 
@@ -44,3 +46,7 @@ if __name__ == "__main__":
 
         print(result)
         print()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

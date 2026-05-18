@@ -7,5 +7,6 @@ class Intelligence:
     def __init__(self, config: Config):
         self._provider = LlmProvider(config)
 
-    def send_message(self, context: list):
-        return send(self._provider, context)
+    async def send_message(self, context: list, should_stream: bool = False):
+        if not should_stream:
+            return send(self._provider, context)
