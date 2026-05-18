@@ -10,6 +10,7 @@ from openai.types.responses import (
 )
 from tools.registry import TOOL_SET
 from typing import Literal
+from tools.call_tool import call_tool
 
 MODEL = "gemma-4-e4b"
 BASE_API_ENDPOINT = "http://127.0.0.1:8000/v1"
@@ -48,19 +49,19 @@ def step(
             token += "<tool_call>"
 
             item: ResponseFunctionToolCall = event.item
-            token += f"type={item.type}\ncall_id={item.call_id}\nname={item.name}"
+            token += f"type={item.type};call_id={item.call_id};name={item.name}"
             if item.status != "in_progress":
-                token += f"\narguments={item.arguments}"
+                token += f";arguments={item.arguments}"
                 token += "</tool_call>"
             else:
-                token += "\narguments="
+                token += ";arguments="
         elif output_item_type == "message":
             next_state = "message"
 
             if machine_state == "reasoning":
                 token += "</think>"
             elif machine_state == "tool_call":
-                token += "</tool>"
+                token += "</tool_call>"
     elif type == "response.reasoning_text.delta":
         token += event.delta
     elif type == "response.function_call_arguments.delta":
@@ -69,20 +70,15 @@ def step(
         token += event.delta
     elif type == "response.output_item.done":
         if event.item.type == "function_call":
-            if machine_state == "tool_call" and not token.strip().endswith(
-                "</tool_call>"
-            ):
-                token += "</tool_call>"
+            pass
         if event.item.type == "reasoning":
             pass
 
     return token, next_state
 
 
-async def main(message: str):
-    client = AsyncOpenAI(base_url=BASE_API_ENDPOINT, api_key="none")
+async def send(client: AsyncOpenAI, context: list):
     current_state: Literal["started", "reasoning", "tool_call", "message"] = "started"
-    context = [{"role": "user", "content": message}]
 
     while True:
         response = await client.responses.create(
@@ -92,7 +88,7 @@ async def main(message: str):
             input=context,
         )
 
-        completed_turn = {"reasoning": None, "tool_calls": [], "message": None}
+        tool_call_queue = []
 
         async for data in response:
             # print(data.to_json())
@@ -106,7 +102,7 @@ async def main(message: str):
                 for completed in completed_items:
                     if completed.type == "reasoning":
                         completed_reasoning: ResponseReasoningItem = completed
-                        print(completed_reasoning.content[0].text)
+                        # print(completed_reasoning.content[0].text)
                     elif completed.type == "function_call":
                         completed_tool_call: ResponseFunctionToolCall = completed
                         context.append(
@@ -117,40 +113,90 @@ async def main(message: str):
                                 "arguments": completed_tool_call.arguments,
                             }
                         )
-
+                        tool_call_queue.append(context[-1])
                     elif completed.type == "message":
                         completed_message: ResponseOutputMessage = completed
                         context.append(
                             {
+                                "type": "message",
                                 "role": completed_message.role,
-                                "content": completed_message.content[0].text,
+                                "content": [
+                                    {
+                                        "type": "output_text",
+                                        "text": completed_message.content[0].text,
+                                    }
+                                ],
                             }
                         )
                     else:
-                        print(completed)
-                        raise ValueError()
+                        raise ValueError(
+                            f"Unknown type when processing response.completed event: {completed.type}"
+                        )
             else:
                 token, next_state = step(
                     machine_state=current_state, event=response_item
                 )
                 if "<think>" in token:
-                    token = token.replace("<think>", "<think>\n", 1)
+                    token = token.replace("<think>", "\n<think>\n", 1)
                 elif "</think>" in token:
-                    token = token.replace("</think>", "\n</think>", 1)
-                elif "<tool_call>" in token:
-                    token = token.replace("<tool_call>", "<tool_call>\n", 1)
+                    token = token.replace("</think>", "\n</think>\n", 1)
                 elif "</tool_call>" in token:
-                    token = token.replace("</tool_call>", "\n</tool_call>", 1)
+                    token = token.replace("</tool_call>", "</tool_call>\n", 1)
 
                 print(token, end="", flush=True)
+
+                # We are starting a brand new message block
+                if (
+                    current_state == "reasoning" or current_state == "tool_call"
+                ) and next_state == "message":
+                    print()
                 current_state = next_state
 
-        print(context)
+        # print(context)
 
-        if current_state == "message":
+        if current_state == "tool_call":
+            # iterate through the tool calls
+            for tool_call in tool_call_queue:
+                name = tool_call["name"]
+
+                if not tool_call["arguments"]:
+                    tool_call["arguments"] = "{}"
+
+                arguments = json.loads(tool_call["arguments"])
+
+                result = call_tool(name, arguments)
+
+                context.append(
+                    {
+                        "type": "function_call_output",
+                        "call_id": tool_call["call_id"],
+                        "output": json.dumps(result),
+                    }
+                )
+        elif current_state == "message":
+            print()
             break
-        elif current_state == "tool_call":
-            break
+
+    return context
 
 
-asyncio.run(main("what is 1+11? then 1+3? then say hi"))
+async def main():
+    client = AsyncOpenAI(base_url=BASE_API_ENDPOINT, api_key="none")
+
+    context = []
+
+    while True:
+        prompt = input("? ")
+
+        context.append(
+            {
+                "type": "message",
+                "role": "user",
+                "content": [{"type": "input_text", "text": prompt}],
+            }
+        )
+
+        context = await send(client, context)
+
+
+asyncio.run(main())
