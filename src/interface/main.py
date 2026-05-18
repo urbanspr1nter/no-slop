@@ -42,7 +42,7 @@ async def main():
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
                     user_request = f.read()
 
-        result = agent.step(user_request)
+        result = await agent.step(user_request)
 
         print(result)
         print()
