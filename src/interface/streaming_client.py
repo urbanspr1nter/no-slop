@@ -1,10 +1,29 @@
 import os
-import asyncio
 import argparse
 from pathlib import Path
 
-from orchestrator.agent import Agent
+from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
+
+import asyncio
+
+import json
+from openai import AsyncOpenAI
+from openai.types.responses import (
+    ResponseStreamEvent,
+    ResponseFunctionToolCall,
+    ResponseOutputMessage,
+    ResponseReasoningItem,
+)
+from tools.registry import TOOL_SET
+from typing import Literal
+from tools.call_tool import call_tool
+
+
+async def send(client: AsyncOpenAI, context: list):
+    current_state: Literal["started", "reasoning", "tool_call", "message"] = "started"
+
+    pass
 
 
 async def main():
@@ -27,7 +46,7 @@ async def main():
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
     config: Config = load_config()
-    agent = Agent(config=config)
+    agent = StreamingAgent(config=config)
 
     agent.set_system_prompt(system_prompt)
 
@@ -42,10 +61,7 @@ async def main():
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
                     user_request = f.read()
 
-        result = await agent.step(user_request)
-
-        print(result)
-        print()
+        await agent.step(user_request)
 
 
 if __name__ == "__main__":

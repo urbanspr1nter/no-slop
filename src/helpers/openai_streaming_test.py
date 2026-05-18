@@ -16,11 +16,6 @@ MODEL = "gemma-4-e4b"
 BASE_API_ENDPOINT = "http://127.0.0.1:8000/v1"
 API_KEY = "none"
 
-STEP_STATE_START = "started"
-STEP_STATE_REASONING = "reasoning"
-STEP_STATE_TOOL_CALL = "tool_call"
-STEP_STATE_MESSAGE = "message"
-
 
 def step(
     machine_state: Literal["started", "reasoning", "tool_call", "message"],
