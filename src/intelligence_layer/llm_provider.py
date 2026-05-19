@@ -6,3 +6,4 @@ class LlmProvider:
         self.base_endpoint = config.base_endpoint
         self.api_key = config.api_key
         self.model_id = config.model_id
+        self.timeout = config.timeout

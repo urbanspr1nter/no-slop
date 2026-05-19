@@ -8,7 +8,7 @@ def send(provider: LlmProvider, context: list) -> list[ResponseOutputItem]:
     client = openai.Client(base_url=provider.base_endpoint, api_key=provider.api_key)
 
     response = client.responses.create(
-        model=provider.model_id, input=context, tools=TOOL_SET
+        model=provider.model_id, input=context, tools=TOOL_SET, timeout=provider.timeout
     )
 
     if response.status == "failed":
