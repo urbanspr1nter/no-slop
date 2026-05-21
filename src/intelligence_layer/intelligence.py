@@ -1,4 +1,4 @@
-from intelligence_layer.llm import send
+from intelligence_layer.llm import send, stream
 from config.loader import Config
 from intelligence_layer.llm_provider import LlmProvider
 
@@ -10,3 +10,5 @@ class Intelligence:
     async def send_message(self, context: list, should_stream: bool = False):
         if not should_stream:
             return send(self._provider, context)
+        else:
+            return await stream(self._provider, context)
