@@ -1,29 +1,15 @@
 import os
 import argparse
 from pathlib import Path
+from prompt_toolkit import prompt
+from prompt_toolkit.history import InMemoryHistory
 
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
 
 import asyncio
 
-import json
-from openai import AsyncOpenAI
-from openai.types.responses import (
-    ResponseStreamEvent,
-    ResponseFunctionToolCall,
-    ResponseOutputMessage,
-    ResponseReasoningItem,
-)
-from tools.registry import TOOL_SET
-from typing import Literal
-from tools.call_tool import call_tool
-
-
-async def send(client: AsyncOpenAI, context: list):
-    current_state: Literal["started", "reasoning", "tool_call", "message"] = "started"
-
-    pass
+history = InMemoryHistory()
 
 
 async def main():
@@ -51,7 +37,16 @@ async def main():
     agent.set_system_prompt(system_prompt)
 
     while True:
-        user_request = input("? ")
+        try:
+            user_request = await asyncio.to_thread(
+                prompt,
+                "? ",
+                multiline=True,
+                history=history,
+            )
+        except (EOFError, KeyboardInterrupt):
+            print("\nbye")
+            break
 
         if user_request == "/bye":
             break
