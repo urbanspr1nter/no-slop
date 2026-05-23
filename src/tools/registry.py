@@ -2,7 +2,7 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "write_file",
-        "description": "Writes a file with contents given a filepath.",
+        "description": "Writes a file with contents given a filepath. Can only write within the workspace directory.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -44,7 +44,7 @@ FILE_SYSTEM_TOOLS = [
     {
         "type": "function",
         "name": "make_directory",
-        "description": "Creates a directory at the filepath.",
+        "description": "Creates a directory at the filepath. Can only create directories within the workspace directory.",
         "parameters": {
             "type": "object",
             "properties": {

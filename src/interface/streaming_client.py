@@ -1,11 +1,13 @@
 import os
 import argparse
+import datetime
 from pathlib import Path
 from prompt_toolkit import prompt
 from prompt_toolkit.history import InMemoryHistory
 
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
+from utils.path_utils import make_real_path
 
 import asyncio
 
@@ -22,8 +24,11 @@ async def send(client: AsyncOpenAI, context: list):
 
 
 async def main():
+    config: Config = load_config()
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--system-prompt")
+    parser.add_argument("-w", "--workspace")
 
     args = parser.parse_args()
 
@@ -38,9 +43,24 @@ async def main():
         except:
             system_prompt = args.system_prompt
 
+    if args.workspace:
+        if os.path.exists(make_real_path(args.workspace)):
+            config.workspace = make_real_path(args.workspace)
+        else:
+            config.workspace = make_real_path(".")
+    else:
+        config.workspace = make_real_path(".")
+
+    system_prompt += f"""
+
+# Session Information:
+
+- The current workspace directory: {config.workspace}
+- The current date (YYYY-MM-dd): {datetime.datetime.today().strftime('%Y-%m-%d')}
+"""
+
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
-    config: Config = load_config()
     agent = StreamingAgent(config=config)
 
     agent.set_system_prompt(system_prompt)
