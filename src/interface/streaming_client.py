@@ -59,6 +59,8 @@ async def main():
 
 - The current workspace directory: {config.workspace}
 - The current date (YYYY-MM-dd): {datetime.datetime.today().strftime('%Y-%m-%d')}
+
+Your workspace directory is where you can write files and create directories, etc. Look at the file system tools information for more information on that. Otherwise, for read operations, you are not confined to the workspace directory.
 """
 
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
