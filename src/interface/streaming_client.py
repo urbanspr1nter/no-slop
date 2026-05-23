@@ -7,18 +7,18 @@ from prompt_toolkit.history import InMemoryHistory
 
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
+from utils.noslop_dir_utils import create_noslop_path_idem, get_noslop_path
 from utils.path_utils import make_real_path
 
 import asyncio
 
-from openai import AsyncOpenAI
-from typing import Literal
-
 history = InMemoryHistory()
 
+NO_SLOP_DIRECTORY = ".noslop"
 
-async def send(client: AsyncOpenAI, context: list):
-    current_state: Literal["started", "reasoning", "tool_call", "message"] = "started"
+
+def init():
+    create_noslop_path_idem()
 
     pass
 
@@ -89,6 +89,10 @@ Your workspace directory is where you can write files and create directories, et
             if os.path.exists(Path(filepath).expanduser().resolve()):
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
                     user_request = f.read()
+
+        if user_request.startswith("/save"):
+            agent.save_session()
+            continue
 
         await agent.step(user_request)
 

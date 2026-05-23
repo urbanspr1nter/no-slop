@@ -1,6 +1,7 @@
 import json
 from context_management.context_manager import ContextManager
 from intelligence_layer.intelligence import Intelligence
+from sessions.session import Session
 from tools.call_tool import call_tool
 from config.loader import Config
 from interface.stream.processor import step as _step
@@ -15,11 +16,15 @@ from openai.types.responses import (
 
 class StreamingAgent:
     def __init__(self, config: Config):
+        self._session = Session()
         self._context_manager = ContextManager()
         self._intelligence = Intelligence(config)
 
     def set_system_prompt(self, sys_prompt: str):
         self._context_manager.set_sys_prompt(sys_prompt)
+
+    def save_session(self):
+        self._session.save(self._context_manager.get_context())
 
     async def step(self, message: str):
         self._context_manager.build_context(message)
