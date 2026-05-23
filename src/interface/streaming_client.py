@@ -51,6 +51,8 @@ async def main():
     else:
         config.workspace = make_real_path(".")
 
+    os.chdir(config.workspace)
+
     system_prompt += f"""
 
 # Session Information:

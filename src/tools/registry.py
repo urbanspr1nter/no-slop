@@ -8,7 +8,7 @@ FILE_SYSTEM_TOOLS = [
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically. path must include the workspace directory.",
                 },
                 "content": {
                     "type": "string",
@@ -50,7 +50,7 @@ FILE_SYSTEM_TOOLS = [
             "properties": {
                 "filepath": {
                     "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically.",
+                    "description": "filepath. parent relative paths will be resolved automatically. path must include the workspace directory.",
                 },
                 "create_parent_if_not_exists": {
                     "type": "boolean",

@@ -1,0 +1,17 @@
+Create a simple tetris game in Python. 
+
+You can use pygame or any other library you need to get it done. 
+
+The game must be:
+- 2D
+- Uses the WASD keys for direction
+- Uses J key to rotate the block
+- Keeps score
+
+Create a requirements.txt when you are done. 
+
+The game should be a single file. main.py. 
+
+Make it easy to run with just the `python3` command. 
+
+Doesn't have to be an extravagant game. Just simple graphical tetris with simple software engineering.
