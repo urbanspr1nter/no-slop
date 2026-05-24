@@ -1,6 +1,5 @@
 import os
 import json
-import shutil
 from pydantic import BaseModel
 from utils.noslop_dir_utils import get_noslop_path
 

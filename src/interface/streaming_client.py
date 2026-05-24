@@ -7,6 +7,7 @@ from prompt_toolkit.history import InMemoryHistory
 
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
+from config.updater import update_config_file
 from utils.noslop_dir_utils import create_noslop_path_idem, get_noslop_path
 from utils.path_utils import make_real_path
 
@@ -99,13 +100,19 @@ Your workspace directory is where you can write files and create directories, et
 
         if user_request == "/bye":
             break
-        if user_request.startswith("/prompt"):
+        elif user_request.startswith("/config"):
+            config_request_parts = user_request.split()
+            config_key = config_request_parts[1]
+            config_value = config_request_parts[2]
+
+            update_config_file(config_key, config_value)
+            continue
+        elif user_request.startswith("/prompt"):
             filepath = user_request.split(" ")[-1]
             if os.path.exists(Path(filepath).expanduser().resolve()):
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
                     user_request = f.read()
-
-        if user_request.startswith("/save"):
+        elif user_request.startswith("/save"):
             agent.save_session()
             continue
 
