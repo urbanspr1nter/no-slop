@@ -45,14 +45,15 @@ class StreamingAgent:
 
         if previous_state != state:
             if previous_state == "reasoning":
-                print("</think>\n", end="", flush=True)
+                print("</think>\n", flush=True)
             elif previous_state == "tool_call":
-                print("</tool_call>\n", end="", flush=True)
+                print("</tool_call>\n", flush=True)
 
             if state == "message":
-                if turn == "[user]":
-                    print("user:")
+                if turn == "user":
+                    print("[user]")
                     print(text)
+                    print()
                 elif turn == "assistant":
                     print("[assistant]")
                 elif turn == "unknown":
@@ -60,7 +61,7 @@ class StreamingAgent:
             elif state == "reasoning":
                 print("<think>\n", end="", flush=True)
             elif state == "tool_call":
-                print("<tool_call>", end="", flush=True)
+                print(f"<tool_call>fn:{text}:", end="", flush=True)
         else:
             # Same state, just print
             print(text, end="", flush=True)
@@ -152,4 +153,4 @@ class StreamingAgent:
             elif current_state == "message":
                 break
 
-        print()
+        print("\n")

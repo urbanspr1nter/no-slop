@@ -69,10 +69,7 @@ async def main():
 Your workspace directory is where you can write files and create directories, etc. Look at the file system tools information for more information on that. Otherwise, for read operations, you are not confined to the workspace directory.
 """
 
-    print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
-
     agent = StreamingAgent(config=config, session_id=args.session_resume)
-
     agent.set_system_prompt(system_prompt)
 
     for m in agent.get_context():
@@ -81,9 +78,11 @@ Your workspace directory is where you can write files and create directories, et
                 print(f"User: {m["content"][0]["text"].strip()}")
             elif m["role"] == "assistant":
                 print(f"Assistant {m["content"][0]["text"].strip()}")
-        else:
+        elif m.get("type", None) == "function_call":
             print(m)
-        print("===")
+        else:
+            print(f"<system_prompt>\n{m['content']}\n</system_prompt>")
+        print()
 
     while True:
         try:
