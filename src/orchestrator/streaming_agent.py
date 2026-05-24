@@ -7,7 +7,6 @@ from config.loader import Config
 from interface.stream.processor import step as _step
 from typing import Literal
 from openai.types.responses import (
-    ResponseStreamEvent,
     ResponseFunctionToolCall,
     ResponseOutputMessage,
     ResponseReasoningItem,
@@ -15,9 +14,13 @@ from openai.types.responses import (
 
 
 class StreamingAgent:
-    def __init__(self, config: Config):
-        self._session = Session()
+    def __init__(self, config: Config, session_id: str | None = None):
+        self._session = Session(session_id)
+
         self._context_manager = ContextManager()
+        if len(self._session.get_context()):
+            self._context_manager.set_context(self._session.get_context())
+
         self._intelligence = Intelligence(config)
 
     def set_system_prompt(self, sys_prompt: str):
@@ -26,12 +29,50 @@ class StreamingAgent:
     def save_session(self):
         self._session.save(self._context_manager.get_context())
 
+    def get_context(self):
+        return self._context_manager.get_context()
+
+    def render(
+        self,
+        text: str,
+        turn: Literal["system", "user", "assistant"],
+        previous_state: Literal["started", "reasoning", "tool_call", "message"],
+        state: Literal["started", "reasoning", "tool_call", "message"],
+    ):
+        if turn == "system":
+            print(f"<system>{text}</system>")
+            return
+
+        if previous_state != state:
+            if previous_state == "reasoning":
+                print("</think>\n", end="", flush=True)
+            elif previous_state == "tool_call":
+                print("</tool_call>\n", end="", flush=True)
+
+            if state == "message":
+                if turn == "[user]":
+                    print("user:")
+                    print(text)
+                elif turn == "assistant":
+                    print("[assistant]")
+                elif turn == "unknown":
+                    print("_unknown:")
+            elif state == "reasoning":
+                print("<think>\n", end="", flush=True)
+            elif state == "tool_call":
+                print("<tool_call>", end="", flush=True)
+        else:
+            # Same state, just print
+            print(text, end="", flush=True)
+
     async def step(self, message: str):
         self._context_manager.build_context(message)
 
         current_state: Literal["started", "reasoning", "tool_call", "message"] = (
             "started"
         )
+
+        self.render(message, "user", "started", "message")
 
         while True:
             stream_response = await self._intelligence.send_message(
@@ -85,19 +126,7 @@ class StreamingAgent:
                         machine_state=current_state, event=response_item
                     )
 
-                    if "<think>" in token:
-                        token = token.replace("<think>", "\n<think>\n", 1)
-                    elif "</think>" in token:
-                        token = token.replace("</think>", "\n</think>\n", 1)
-                    elif "</tool_call>" in token:
-                        token = token.replace("</tool_call>", "</tool_call>\n", 1)
-
-                    print(token, end="", flush=True)
-
-                    if (
-                        current_state == "reasoning" or current_state == "tool_call"
-                    ) and next_state == "message":
-                        print()
+                    self.render(token, "assistant", current_state, next_state)
 
                     current_state = next_state
 
@@ -121,5 +150,6 @@ class StreamingAgent:
                         }
                     )
             elif current_state == "message":
-                print()
                 break
+
+        print()

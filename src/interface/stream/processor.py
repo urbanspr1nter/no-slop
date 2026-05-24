@@ -19,35 +19,11 @@ def step(
         output_item_type = event.item.type
 
         if output_item_type == "reasoning":
-            if machine_state == "tool_call":
-                token += "</tool_call>"
-
             next_state = "reasoning"
-            token += "<think>"
         elif output_item_type == "function_call":
-            if machine_state == "reasoning":
-                token += "</think>"
-            elif machine_state == "tool_call":
-                token += "</tool_call>"
-
             next_state = "tool_call"
-            token += "<tool_call>"
-
-            item: ResponseFunctionToolCall = event.item
-            token += f"type={item.type};call_id={item.call_id};name={item.name}"
-
-            if item.status != "in_progress":
-                token += f";arguments={item.arguments}"
-                token += "</tool_call>"
-            else:
-                token += ";argument="
         elif output_item_type == "message":
             next_state = "message"
-
-            if machine_state == "reasoning":
-                token += "</think>"
-            elif machine_state == "tool_call":
-                token += "</tool_call>"
         else:
             pass
     elif type == "response.reasoning_text.delta":

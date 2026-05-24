@@ -4,7 +4,7 @@ _config = None
 
 
 class Config(BaseModel):
-    base_endpoint: str = "http://192.168.1.30:8000/v1"
+    base_endpoint: str = "http://localhost:8000/v1"
     api_key: str = "none"
     model_id: str = "qwen3.6-27b"
     timeout: int = 7200

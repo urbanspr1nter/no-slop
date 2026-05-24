@@ -24,11 +24,14 @@ def init():
 
 
 async def main():
+    init()
+
     config: Config = load_config()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--system-prompt")
     parser.add_argument("-w", "--workspace")
+    parser.add_argument("--session-resume")
 
     args = parser.parse_args()
 
@@ -53,6 +56,9 @@ async def main():
 
     os.chdir(config.workspace)
 
+    if args.session_resume:
+        print(f"Resuming session: {args.session_resume}")
+
     system_prompt += f"""
 
 # Session Information:
@@ -65,9 +71,19 @@ Your workspace directory is where you can write files and create directories, et
 
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
-    agent = StreamingAgent(config=config)
+    agent = StreamingAgent(config=config, session_id=args.session_resume)
 
     agent.set_system_prompt(system_prompt)
+
+    for m in agent.get_context():
+        if m.get("type", None) == "message":
+            if m["role"] == "user":
+                print(f"User: {m["content"][0]["text"].strip()}")
+            elif m["role"] == "assistant":
+                print(f"Assistant {m["content"][0]["text"].strip()}")
+        else:
+            print(m)
+        print("===")
 
     while True:
         try:
@@ -95,6 +111,9 @@ Your workspace directory is where you can write files and create directories, et
             continue
 
         await agent.step(user_request)
+
+        # Save session after agent response
+        agent.save_session()
 
 
 if __name__ == "__main__":
