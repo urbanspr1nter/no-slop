@@ -9,7 +9,7 @@ _config = None
 class Config(BaseModel):
     base_endpoint: str = "http://localhost:8000/v1"
     api_key: str = "none"
-    model_id: str = "qwen3.6-27b"
+    model_id: str = "gemma-4-e4b-it"
     timeout: int = 7200
     workspace: str = "."
 
@@ -18,6 +18,8 @@ def load_config():
     global _config
 
     noslop_path = get_noslop_path()
+
+    # Typical config.json lives in: ~/.noslop/config.json for example
     noslop_config_path = f"{noslop_path}/config.json"
 
     if _config is None:
@@ -39,6 +41,9 @@ def load_config():
             _config.timeout = provider_config["timeout"]
             _config.workspace = workspace_default
 
-            print(f"Loaded config defaults: {dict(_config)}")
+            displayed_config = dict(_config)
+            displayed_config["api_key"] = "[REDACTED]"
+
+            print(f"Loaded config defaults: {displayed_config}")
 
     return _config

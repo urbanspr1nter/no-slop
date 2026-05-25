@@ -10,6 +10,7 @@ from config.loader import load_config, Config
 from config.updater import update_config_file
 from utils.noslop_dir_utils import create_noslop_path_idem, get_noslop_path
 from utils.path_utils import make_real_path
+from config.updater import update_config_file
 
 import asyncio
 
@@ -101,6 +102,7 @@ Your workspace directory is where you can write files and create directories, et
         if user_request == "/bye":
             break
         elif user_request.startswith("/config"):
+            # Ex: /config providers.local.model qwen3.6-9b
             config_request_parts = user_request.split()
             config_key = config_request_parts[1]
             config_value = config_request_parts[2]

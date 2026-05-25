@@ -11,7 +11,10 @@ def update_config_file(key: str, value: str):
         with open(noslop_config_path, "r") as f:
             loaded_config = json.loads(f.read())
 
+        # key is like provider.local.model
         keys = key.split(".")
+
+        # keys=[provider,local], last_key=model
         last_key = keys.pop()
 
         curr_node = loaded_config

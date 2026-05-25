@@ -8,20 +8,22 @@ NO_SLOP_DIRECTORY = ".noslop"
 
 def get_noslop_path() -> str:
     home_dir = get_home_directory()
+
+    # Ideally transforms to: /home/username/.noslop
     noslop_abs_dir = f"{home_dir}/{NO_SLOP_DIRECTORY}"
 
     return noslop_abs_dir
 
 
 def create_noslop_path_idem() -> bool:
-    """Create the .noslop directory if doesn't exist under home.
+    """Create the .noslop directory if it doesn't exist under home.
 
     This is idempotent.
 
     Returns:
-        result - True|False depending on what happened
-            - True if directory was created
-            - False if already exists or something else.
+        result - True|False depending on what happened.
+        - True if directory was created
+        - False if directory already exists or something else happened
     """
     noslop_abs_dir = get_noslop_path()
 
@@ -33,29 +35,31 @@ def create_noslop_path_idem() -> bool:
     return False
 
 
-def make_noslop_path(path: str) -> str:
-    real_path = Path(f"{get_noslop_path()}/{path}").expanduser().resolve()
+def make_noslop_path(filename: str) -> str:
+    real_path = Path(f"{get_noslop_path()}/{filename}").expanduser().resolve()
 
     return str(real_path)
 
 
-def noslop_write_file(contents: str, path: str) -> str:
-    dest_path = make_noslop_path(path)
+def noslop_write_file(contents: str, filename: str) -> str:
+    dest_path = make_noslop_path(filename)
 
     try:
         with open(dest_path, "w") as f:
             f.write(contents)
     except IOError:
-        print(f"Couldn't write {contents} to path: {path}")
+        print(f"Couldn't write {contents} to {filename}.")
         raise
 
 
-def noslop_read_file(path: str) -> str:
-    dest_path = make_noslop_path(path)
+def noslop_read_file(filename: str) -> str:
+    dest_path = make_noslop_path(filename)
 
     try:
         with open(dest_path, "r") as f:
             contents = f.read()
+
+        return contents
     except (IOError, FileNotFoundError):
-        print(f"File not found error: {contents}")
+        print(f"File not found error: {filename}")
         raise
