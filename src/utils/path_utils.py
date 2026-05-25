@@ -8,3 +8,9 @@ def make_real_path(p: str) -> str:
     resolved = Path(working_p).expanduser().resolve()
 
     return str(resolved)
+
+
+def get_home_directory() -> str:
+    home_dir = Path("~").expanduser()
+
+    return home_dir

@@ -1,0 +1,12 @@
+{
+    "provider": "local",
+    "providers": {
+        "local": {
+            "base_endpoint": "http://localhost:8000/v1",
+            "api_key_env": "NOSLOP_API_KEY",
+            "model": "gemma-4-e4b-it",
+            "timeout": 7200
+        }
+    },
+    "workspace_default": "."
+}

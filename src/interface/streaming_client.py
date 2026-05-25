@@ -8,6 +8,7 @@ from prompt_toolkit.history import InMemoryHistory
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
 from utils.path_utils import make_real_path
+from config.updater import update_config_file
 
 import asyncio
 
@@ -82,7 +83,16 @@ async def main():
 
         if user_request == "/bye":
             break
-        if user_request.startswith("/prompt"):
+        elif user_request.startswith("/config"):
+            # Ex: /config providers.local.model qwen3.6-9b
+            config_request_parts = user_request.split()
+            config_key = config_request_parts[1]
+            config_value = config_request_parts[2]
+
+            update_config_file(config_key, config_value)
+
+            continue
+        elif user_request.startswith("/prompt"):
             filepath = user_request.split(" ")[-1]
             if os.path.exists(Path(filepath).expanduser().resolve()):
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
