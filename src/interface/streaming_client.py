@@ -8,28 +8,29 @@ from prompt_toolkit.history import InMemoryHistory
 from orchestrator.streaming_agent import StreamingAgent
 from config.loader import load_config, Config
 from utils.path_utils import make_real_path
+from utils.noslop_dir_utils import create_noslop_path_idem
 from config.updater import update_config_file
 
 import asyncio
 
-from openai import AsyncOpenAI
-from typing import Literal
-
 history = InMemoryHistory()
 
+NO_SLOP_DIRECTORY = ".noslop"
 
-async def send(client: AsyncOpenAI, context: list):
-    current_state: Literal["started", "reasoning", "tool_call", "message"] = "started"
 
-    pass
+def init():
+    create_noslop_path_idem()
 
 
 async def main():
+    init()
+
     config: Config = load_config()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--system-prompt")
     parser.add_argument("-w", "--workspace")
+    parser.add_argument("--session-resume")
 
     args = parser.parse_args()
 
@@ -54,19 +55,35 @@ async def main():
 
     os.chdir(config.workspace)
 
+    if args.session_resume:
+        print(f"Resuming session: {args.session_resume}")
+
     system_prompt += f"""
 
 # Session Information:
 
 - The current workspace directory: {config.workspace}
 - The current date (YYYY-MM-dd): {datetime.datetime.today().strftime('%Y-%m-%d')}
+
+Your workspace directory is where you can write files and create directories, etc. Look at the file system tools descriptions for more guidance on that. Otherwise, for read operations, you are not restricted to operating within the workspace directory.
 """
 
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
-    agent = StreamingAgent(config=config)
-
+    agent = StreamingAgent(config=config, session_id=args.session_resume)
     agent.set_system_prompt(system_prompt)
+
+    for m in agent.get_context():
+        if m.get("type", None) == "message":
+            if m["role"] == "user":
+                print(f"[user]: {m["content"][0]["text"].strip()}")
+            elif m["role"] == "assistant":
+                print(f"[assistant]: {m["content"][0]["text"].strip()}")
+        elif m.get("type", None) == "function_call":
+            print(m)
+        else:
+            print(f"<system_prompt>\n{m["content"]}\n</system_prompt>")
+        print()
 
     while True:
         try:
@@ -97,8 +114,14 @@ async def main():
             if os.path.exists(Path(filepath).expanduser().resolve()):
                 with open(Path(filepath).expanduser().resolve(), "r") as f:
                     user_request = f.read()
+        elif user_request.startswith("/save"):
+            agent.save_session()
+            continue
 
         await agent.step(user_request)
+
+        # Save session after agent response
+        agent.save_session()
 
 
 if __name__ == "__main__":
