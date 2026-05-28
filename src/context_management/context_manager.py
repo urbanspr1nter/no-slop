@@ -14,6 +14,9 @@ class ContextManager:
 
         self._context[0] = {"role": "system", "content": self._sys_prompt}
 
+    def set_context(self, context: list):
+        self._context = context
+
     def build_context(self, prompt: str) -> list[dict]:
         self._context.append(
             {

@@ -10,15 +10,27 @@ from openai.types.responses import (
     ResponseOutputMessage,
     ResponseReasoningItem,
 )
+from sessions.session import Session
 
 
 class StreamingAgent:
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, session_id: str | None = None):
+        self._session = Session(session_id)
+
         self._context_manager = ContextManager()
+        if len(self._session.get_context()):
+            self._context_manager.set_context(self._session.get_context())
+
         self._intelligence = Intelligence(config)
 
     def set_system_prompt(self, sys_prompt: str):
         self._context_manager.set_sys_prompt(sys_prompt)
+
+    def save_session(self):
+        self._session.save(self._context_manager.get_context())
+
+    def get_context(self):
+        return self._context_manager.get_context()
 
     def render(
         self,
