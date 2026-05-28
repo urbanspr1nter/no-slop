@@ -21,8 +21,8 @@ def step(
         if output_item_type == "reasoning":
             next_state = "reasoning"
         elif output_item_type == "function_call":
+            token += event.item.name
             next_state = "tool_call"
-            token += f"{event.item.name}"
         elif output_item_type == "message":
             next_state = "message"
         else:

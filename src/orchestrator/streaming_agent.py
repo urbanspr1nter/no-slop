@@ -11,6 +11,7 @@ from openai.types.responses import (
     ResponseOutputMessage,
     ResponseReasoningItem,
 )
+from sessions.session import Session
 
 
 class StreamingAgent:
@@ -45,7 +46,7 @@ class StreamingAgent:
 
         if previous_state != state:
             if previous_state == "reasoning":
-                print("</think>\n", flush=True)
+                print("\n</think>\n", flush=True)
             elif previous_state == "tool_call":
                 print("</tool_call>\n", flush=True)
 
@@ -56,14 +57,12 @@ class StreamingAgent:
                     print()
                 elif turn == "assistant":
                     print("[assistant]")
-                elif turn == "unknown":
-                    print("_unknown:")
             elif state == "reasoning":
                 print("<think>\n", end="", flush=True)
             elif state == "tool_call":
                 print(f"<tool_call>fn:{text}:", end="", flush=True)
         else:
-            # Same state, just print
+            # Same state, just print token
             print(text, end="", flush=True)
 
     async def step(self, message: str):
