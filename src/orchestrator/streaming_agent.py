@@ -1,7 +1,6 @@
 import json
 from context_management.context_manager import ContextManager
 from intelligence_layer.intelligence import Intelligence
-from sessions.session import Session
 from tools.call_tool import call_tool
 from config.loader import Config
 from interface.stream.processor import step as _step
