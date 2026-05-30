@@ -31,7 +31,7 @@ def shell_exec_sync(
             [program, *arguments],
             capture_output=True,
             text=True,
-            timeout=timeout,
+            timeout=int(timeout),
             env={**os.environ, **env},
         )
     except FileNotFoundError:
