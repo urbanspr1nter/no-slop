@@ -281,8 +281,47 @@ EDITING_TOOLS = [
     }
 ]
 
+WEB_TOOLS = [
+    {
+        "type": "function",
+        "name": "web_search",
+        "description": "Performs a web search given a query. Optionally, provide a search results limit. Default limit is 10 results. Returns a markdown string respresentation of all the search results with each result formatted with TITLE, DESCRIPTION and URL.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Query to search the web for related content.",
+                },
+                "limit": {
+                    "type": "number",
+                    "description": "Number of results to return. Default is 10.",
+                },
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "type": "function",
+        "name": "web_page_scrape",
+        "description": "Scrapes a web page for contents given a URL. Returns the markdown representation of the web page.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "Web page URL to scrape contents.",
+                }
+            },
+            "required": ["url"],
+        },
+    },
+]
+
+
 TOOL_SET = []
 TOOL_SET.extend(FILE_SYSTEM_TOOLS)
 TOOL_SET.extend(MATH_TOOLS)
 TOOL_SET.extend(SHELL_TOOLS)
 TOOL_SET.extend(EDITING_TOOLS)
+TOOL_SET.extend(WEB_TOOLS)

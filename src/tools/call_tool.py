@@ -1,8 +1,9 @@
 import tools.ns_math as ns_math
 import tools.fs as fs
 import tools.shell as shell
-import tools.glob as glob
+import tools.glob_tool as glob_tool
 import tools.file_edit_and_show_diff as edit
+import tools.web_search_and_scrape as web
 
 
 def call_tool(tool_name: str, args: dict):
@@ -73,11 +74,17 @@ def call_tool(tool_name: str, args: dict):
             filepath=args.get("filepath", ""),
         )
     elif tool_name == "glob":
-        result = glob.glob(
+        result = glob_tool.glob(
             start_path=args.get("start_path", ""),
             glob_path=args.get("glob_path", ""),
             recurse=args.get("recurse", False),
         )
+    elif tool_name == "web_search":
+        result = web.web_search(
+            query=args.get("query", ""), limit=args.get("limit", 10)
+        )
+    elif tool_name == "web_page_scrape":
+        result = web.web_page_scrape(url=args.get("url", ""))
     else:
         result = {"status": "failure"}
 

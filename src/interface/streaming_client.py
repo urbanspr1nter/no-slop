@@ -81,8 +81,13 @@ Your workspace directory is where you can write files and create directories, et
                 print(f"[assistant]: {m["content"][0]["text"].strip()}")
         elif m.get("type", None) == "function_call":
             print(m)
+        elif m.get("type", None) == "function_call_output":
+            print(m)
         else:
-            print(f"<system_prompt>\n{m["content"]}\n</system_prompt>")
+            if m.get("role", None) == "system":
+                print(f"<system_prompt>\n{m["content"]}\n</system_prompt>")
+            else:
+                print(m)
         print()
 
     while True:

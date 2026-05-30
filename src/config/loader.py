@@ -12,6 +12,7 @@ class Config(BaseModel):
     model_id: str = "gemma-4-e4b-it"
     timeout: int = 7200
     workspace: str = "."
+    search_and_scrape_service_url: str = ""
 
 
 def load_config():
@@ -40,6 +41,10 @@ def load_config():
             _config.model_id = provider_config["model"]
             _config.timeout = provider_config["timeout"]
             _config.workspace = workspace_default
+
+            _config.search_and_scrape_service_url = _loaded_config.get(
+                "search_and_scrape_service_url", ""
+            )
 
             displayed_config = dict(_config)
             displayed_config["api_key"] = "[REDACTED]"
