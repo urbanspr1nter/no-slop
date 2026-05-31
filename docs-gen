@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [ -z "${1:-}" ]; then
+    echo "provide a path to the params file."
+    exit
+fi
+
+PROMPT=$1
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+VENV_DIR="$SCRIPT_DIR/.venv"
+
+PROMPT_TEXT=$("$VENV_DIR/bin/python" "$SCRIPT_DIR/create_tutorial_prompt.py" --template "$SCRIPT_DIR/examples/user_prompts/documentation.txt" --params "$PROMPT")
+
+"$VENV_DIR/bin/python" "$SCRIPT_DIR/src/interface/streaming_client.py" \
+    -s "$SCRIPT_DIR/examples/system_prompts/coding_agent.txt" \
+    -w "$PWD" \
+    -p "$PROMPT_TEXT"

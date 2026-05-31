@@ -64,14 +64,15 @@ class StreamingAgent:
             # Same state, just print token
             print(text, end="", flush=True)
 
-    async def step(self, message: str):
+    async def step(self, message: str, headless: bool = False):
         self._context_manager.build_context(message)
 
         current_state: Literal["started", "reasoning", "tool_call", "message"] = (
             "started"
         )
 
-        self.render(message, "user", "started", "message")
+        if not headless:
+            self.render(message, "user", "started", "message")
 
         while True:
             stream_response = await self._intelligence.send_message(

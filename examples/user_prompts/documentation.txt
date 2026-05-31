@@ -1,0 +1,27 @@
+Write a tutorial or documentation about: {{description}}
+
+# Delivery Format
+
+- HTML. You can use CSS and JS to enhance the teaching and learning experience.
+- You can leverage CDNs to include rich CSS and JS libraries.
+    - Use the available search and scrape tools to validate.
+    - You may also use shell exec to curl to confirm the remote resource exists.
+- Feel free to create mermaid diagrams and syntax highlighted code to create visual demonstrations
+
+# Writing Style
+
+- Professional, approachable tone.
+- Prefer prose over bullet point format.
+- No length limit
+
+# References
+
+If references are used, always cite the sources with their links at the end of the tutorial in a separate section.
+
+# Output
+
+Output the artifact to: {{output_path}}
+
+# Documentation Requirements
+
+{{requirements}}

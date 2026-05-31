@@ -31,6 +31,8 @@ async def main():
     parser.add_argument("-s", "--system-prompt")
     parser.add_argument("-w", "--workspace")
     parser.add_argument("--session-resume")
+    parser.add_argument("-p", "--prompt")
+    parser.add_argument("-t")
 
     args = parser.parse_args()
 
@@ -63,65 +65,72 @@ async def main():
         "{{current_date}}", datetime.datetime.today().strftime("%Y-%m-%d")
     )
 
-    print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
-
     agent = StreamingAgent(config=config, session_id=args.session_resume)
     agent.set_system_prompt(system_prompt)
 
-    for m in agent.get_context():
-        if m.get("type", None) == "message":
-            if m["role"] == "user":
-                print(f"[user]: {m["content"][0]["text"].strip()}")
-            elif m["role"] == "assistant":
-                print(f"[assistant]: {m["content"][0]["text"].strip()}")
-        elif m.get("type", None) == "function_call":
-            print(m)
-        elif m.get("type", None) == "function_call_output":
-            print(m)
-        else:
-            if m.get("role", None) == "system":
-                print(f"<system_prompt>\n{m["content"]}\n</system_prompt>")
-            else:
-                print(m)
-        print()
-
-    while True:
-        try:
-            user_request = await asyncio.to_thread(
-                prompt, "? ", multiline=True, history=history
-            )
-        except (EOFError, KeyboardInterrupt):
-            print("\nbye")
-            break
-
-        user_request = user_request.strip()
+    if args.prompt:
+        user_request = args.prompt.strip()
         if not user_request:
-            continue
+            return
 
-        if user_request == "/bye":
-            break
-        elif user_request.startswith("/config"):
-            # Ex: /config providers.local.model qwen3.6-9b
-            config_request_parts = user_request.split()
-            config_key = config_request_parts[1]
-            config_value = config_request_parts[2]
+        await agent.step(user_request, headless=True)
+    else:
+        print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
-            update_config_file(config_key, config_value)
+        for m in agent.get_context():
+            if m.get("type", None) == "message":
+                if m["role"] == "user":
+                    print(f"[user]: {m["content"][0]["text"].strip()}")
+                elif m["role"] == "assistant":
+                    print(f"[assistant]: {m["content"][0]["text"].strip()}")
+            elif m.get("type", None) == "function_call":
+                print(m)
+            elif m.get("type", None) == "function_call_output":
+                print(m)
+            else:
+                if m.get("role", None) == "system":
+                    print(f"<system_prompt>\n{m["content"]}\n</system_prompt>")
+                else:
+                    print(m)
+            print()
 
-            continue
-        elif user_request.startswith("/prompt"):
-            filepath = user_request.split(" ")[-1]
-            if os.path.exists(Path(filepath).expanduser().resolve()):
-                with open(Path(filepath).expanduser().resolve(), "r") as f:
-                    user_request = f.read()
-        elif user_request.startswith("/save"):
+        while True:
+            try:
+                user_request = await asyncio.to_thread(
+                    prompt, "? ", multiline=True, history=history
+                )
+            except (EOFError, KeyboardInterrupt):
+                print("\nbye")
+                break
+
+            user_request = user_request.strip()
+            if not user_request:
+                continue
+
+            if user_request == "/bye":
+                break
+            elif user_request.startswith("/config"):
+                # Ex: /config providers.local.model qwen3.6-9b
+                config_request_parts = user_request.split()
+                config_key = config_request_parts[1]
+                config_value = config_request_parts[2]
+
+                update_config_file(config_key, config_value)
+
+                continue
+            elif user_request.startswith("/prompt"):
+                filepath = user_request.split(" ")[-1]
+                if os.path.exists(Path(filepath).expanduser().resolve()):
+                    with open(Path(filepath).expanduser().resolve(), "r") as f:
+                        user_request = f.read()
+            elif user_request.startswith("/save"):
+                agent.save_session()
+                continue
+
+            await agent.step(user_request)
+
+            # Save session after agent response
             agent.save_session()
-            continue
-
-        await agent.step(user_request)
-
-        # Save session after agent response
-        agent.save_session()
 
 
 if __name__ == "__main__":
