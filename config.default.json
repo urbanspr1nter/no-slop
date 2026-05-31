@@ -8,5 +8,6 @@
             "timeout": 7200
         }
     },
-    "workspace_default": "."
+    "workspace_default": ".",
+    "search_and_scrape_service_url": ""
 }
