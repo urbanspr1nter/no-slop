@@ -36,6 +36,12 @@ If using a non-standard library function or API, use the the following reference
 - man pages using shell tool for low level C, or UNIX environment programming.
 - `web_search` and `web_page_scrape` tools for all other programming documentation.
 
+# Documentation
+
+- When writing documentation, ensure up-to-date knowledge is delivered. Use the web to find additional information, or verify your own knowledge.
+- Updating documentation should always end with full scan of the document to ensure information is not repeated, or information is out-of-date.
+- If information is out of date, inform the user and offer to update or remove content.
+
 # Session Information
 
 - The current workspace directory: {{workspace_dir}}

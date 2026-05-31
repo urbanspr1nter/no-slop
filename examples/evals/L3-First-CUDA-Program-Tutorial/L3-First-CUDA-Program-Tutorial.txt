@@ -1,0 +1,17 @@
+Write a CUDA tutorial for someone new who only knows C programming in Linux.
+
+The delivery format will be in HTML, so you can use CSS and JS to enhance the teaching and learning experience.
+
+Feel free to create mermaid diagrams, if needed.
+
+What should be in the tutorial:
+1. What is CUDA, and how to think about it in comparison to normal C programming.
+2. How to compile a CUDA program.
+3. Writing a CUDA program as a first example.
+4. How CUDA programs are executed and compare/contrast with normal programming.
+5. Advice on mental model in how to be successful with CUDA programming.
+6. Beginning project ideas.
+
+Writing style: professional, approachable tone, prefer prose over bullet point format, no length limit.
+
+Write the file to: examples/evals/L3-First-CUDA-Program-Tutorial/gemma-4-26b-a4b-it.html

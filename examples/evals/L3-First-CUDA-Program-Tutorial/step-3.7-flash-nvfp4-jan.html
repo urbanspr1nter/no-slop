@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The First CUDA Program — A Gentle Introduction for C Programmers</title>
+    <!-- Mermaid for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cuda.min.js"></script>
+    <style>
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #2c2c2c;
+            --secondary-text: #5a5a5a;
+            --accent: #0d47a1;
+            --accent-light: #e3f2fd;
+            --code-bg: #1e1e1e;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --radius: 12px;
+            --max-width: 860px;
+            --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Menlo', 'Consolas', monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--secondary-text);
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid var(--accent-light);
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #1565c0;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: #f0f0f0;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.92em;
+            color: #d6336c;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .card-warning {
+            background: #fff8e1;
+            border-left: 4px solid #f9a825;
+        }
+
+        .card-info {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+        }
+
+        .mermaid {
+            margin: 2rem auto;
+            text-align: center;
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        pre {
+            background: var(--code-bg) !important;
+            border-radius: var(--radius) !important;
+            padding: 1.25rem !important;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid #333;
+        }
+
+        pre code {
+            background: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-size: 0.9rem;
+        }
+
+        .cta {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 0.7rem 1.4rem;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .cta:hover {
+            background: #1565c0;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .project-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .project-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-size: 1.05rem;
+        }
+
+        .project-card p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+            color: var(--secondary-text);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        nav .toc {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.25rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        nav .toc h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        nav .toc ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        nav .toc ul li a {
+            background: var(--accent-light);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        nav .toc ul li a:hover {
+            background: #bbdefb;
+        }
+
+        .interactive-demo {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin: 1.5rem 0;
+        }
+
+        button.run-demo {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        button.run-demo:hover {
+            background: #1b5e20;
+        }
+
+        .demo-output {
+            margin-top: 1rem;
+            font-family: var(--font-mono);
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            min-height: 3rem;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.3rem; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The First CUDA Program</h1>
+            <p class="subtitle">A gentle, prose-driven introduction for C programmers walking onto the GPU</p>
+        </header>
+
+        <nav class="toc" aria-label="Table of contents">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#what-is-cuda">What is CUDA?</a></li>
+                <li><a href="#compiling">Compiling</a></li>
+                <li><a href="#first-program">First Program</a></li>
+                <li><a href="#execution-model">Execution Model</a></li>
+                <li><a href="#mental-model">Mental Model</a></li>
+                <li><a href="#projects">Project Ideas</a></li>
+            </ul>
+        </nav>
+
+        <section id="what-is-cuda">
+            <h2>1. What Is CUDA, and How Should a C Programmer Think About It?</h2>
+
+            <p>
+                If you have spent any meaningful time writing C, you are already comfortable with a mental model in which a single program executes on a single processor core, step by step, statement by statement. The CPU is a generalist: it is designed to handle a wide variety of tasks, to branch unpredictably, to fetch data from main memory through several layers of cache, and to execute complex control flow with minimal latency. When you compile a C program with <code>gcc</code>, that is exactly the world you are describing — a world of sequential execution with occasional compiler optimizations that might reorder or parallelize independent operations behind the scenes.
+            </p>
+
+            <p>
+                CUDA changes the fundamental unit of thinking. CUDA, which stands for <em>Compute Unified Device Architecture</em>, is a parallel computing platform and programming model developed by NVIDIA. It allows you to use a graphics processing unit — a GPU — not just for rendering 3D scenes, but for general-purpose computation. The GPU is a specialist: it consists of thousands of smaller, more efficient cores designed to handle multiple tasks simultaneously. Whereas a CPU might have four, eight, or a few dozen powerful cores, a modern NVIDIA GPU can have thousands of simpler cores grouped into streaming multiprocessors (SMs).
+            </p>
+
+            <p>
+                For a C programmer, the most important conceptual shift is this: <strong>you are no longer describing what happens next; you are describing what happens everywhere at once</strong>. In CUDA, you write functions called <em>kernels</em> that execute in parallel across many threads. These kernels look like ordinary C functions, but they run on the GPU instead of the CPU, and they are executed by hundreds or thousands of threads concurrently. Your job becomes one of data decomposition: figuring out how to split your problem into independent pieces that can be solved simultaneously, and then letting the GPU do the heavy lifting.
+            </p>
+
+            <p>
+                Another way to think about it is a metaphor. Imagine you need to wash a very large number of dishes. A CPU is like a single person who is extremely fast, can reach any shelf, and can handle any dish, no matter how oddly shaped. A GPU is like a team of a thousand people who are each moderately fast. If the dishes are identical plates arranged in a long row, the team of a thousand can finish the job in a fraction of the time, provided you can hand each person a plate at the same moment. The catch is that the team needs some coordination: you cannot have five hundred people waiting for a single faucet, and you cannot easily have them wash plates that are still drying in the other room. CUDA is the system that lets you assign dishes, hand out soap, and collect the clean results without becoming the bottleneck yourself.
+            </p>
+
+            <div class="mermaid">
+                flowchart LR
+                    A["CPU (Host)<br>Few cores, high latency<br>Handles orchestration<br>Runs your main()"] --> B["PCIe Bus<br>(relatively slow)"]
+                    B --> C["GPU (Device)<br>Thousands of cores<br>Low latency, high bandwidth<br>Runs CUDA kernels"]
+                    C --> B
+                    B --> A
+                    style C fill:#0d47a1,color:#fff,stroke:#0d47a1
+                    style A fill:#e3f2fd,stroke:#0d47a1
+                    style B fill:#fff3e0,stroke:#ef6c00
+            </div>
+
+            <p>
+                This analogy points to the heart of the CUDA programming model: the CPU and GPU are separate processors with their own memory spaces, and data must usually move between them over a bus that, while fast, is still far slower than the GPU's internal memory bandwidth. A successful CUDA programmer learns to minimize that traffic, to pack computation so densely that the transfer cost is amortized across millions of operations.
+            </p>
+        </section>
+
+        <section id="compiling">
+            <h2>2. How to Compile a CUDA Program</h2>
+
+            <p>
+                Just as your C programs rely on <code>gcc</code> or <code>clang</code> to turn source code into an executable, CUDA programs rely on the <strong>NVIDIA CUDA Compiler</strong>, colloquially called <code>nvcc</code>. The good news is that <code>nvcc</code> is designed to feel familiar. It understands both standard C and C++ (and CUDA-specific extensions), and its command-line interface is deliberately similar to <code>gcc</code>.
+            </p>
+
+            <p>
+                Before you can compile anything, you need the CUDA toolkit installed on your Linux machine. This is a free download from NVIDIA. The toolkit includes <code>nvcc</code>, the necessary libraries, header files, and samples. On Debian- or Ubuntu-based systems, installation is usually straightforward after adding NVIDIA's package repository. Once installed, <code>nvcc</code> is typically available in your <code>PATH</code>, and you can verify it with a simple <code>nvcc --version</code>.
+            </p>
+
+            <p>
+                A CUDA source file conventionally uses the <code>.cu</code> extension. This is important: it tells <code>nvcc</code> that the file contains CUDA-specific syntax that <code>gcc</code> would not understand. Inside a <code>.cu</code> file, you can mix host code (code that runs on the CPU, written in standard C or C++) with device code (code that runs on the GPU, written in CUDA C/C++). The compiler separates these two worlds during compilation, compiles the host portion with a standard host compiler like <code>gcc</code>, and compiles the device portion internally for the GPU architecture you target.
+            </p>
+
+            <div class="card card-info">
+                <strong>Understanding the compilation pipeline</strong>
+                <p>
+                    When you run <code>nvcc</code>, it performs a two-stage process. First, it separates the input into <em>host code</em> and <em>device code</em>. The host code is handed off to your system's standard compiler (usually <code>gcc</code> or <code>clang</code>) and compiled into x86 or ARM instructions. The device code is compiled into an intermediate representation called PTX (Parallel Thread Execution), which is a low-level, architecture-agnostic assembly-like language. At runtime, the PTX is further compiled by the NVIDIA driver into the actual binary instructions for the specific GPU in your machine. This two-stage process is why CUDA executables can often run on different GPU architectures without recompilation, though recompiling for a specific architecture using the <code>-gencode</code> flag usually yields better performance.
+                </p>
+            </div>
+
+            <p>
+                In practice, compiling a simple program is as easy as running <code>nvcc</code> with the source file and an output flag. For example, to compile a file named <code>vector_add.cu</code> into an executable called <code>vector_add</code>, you would write:
+            </p>
+
+            <pre><code class="language-bash">nvcc -o vector_add vector_add.cu</code></pre>
+
+            <p>
+                This single command is surprisingly powerful. <code>nvcc</code> generates the host-side wrapper code, compiles the kernels for your GPU's compute capability, links against the CUDA runtime library (<code>libcudart</code>), and produces an executable that you can run just like any other Linux binary. There is no separate linking step required, although you can certainly break compilation into stages if you are building a larger project.
+            </p>
+
+            <p>
+                If you are integrating CUDA into an existing project with a Makefile, the transition is relatively painless. You simply need to replace the compiler variable from <code>gcc</code> to <code>nvcc</code> for the files that contain <code>.cu</code> extensions, and add the appropriate CUDA include and library paths. Here is a minimal Makefile skeleton that demonstrates the idea:
+            </p>
+
+            <pre><code class="language-makefile"># Minimal Makefile for a CUDA project
+NVCC = nvcc
+CXXFLAGS = -std=c++14 -O2
+
+# Source files
+SRCS = main.cu kernels.cu utils.cu
+
+# Output executable
+TARGET = my_cuda_app
+
+# Rule to build the target
+$(TARGET): $(SRCS)
+	$(NVCC) $(CXXFLAGS) -o $(TARGET) $(SRCS)
+
+# Clean rule
+clean:
+	rm -f $(TARGET)
+
+.PHONY: clean</code></pre>
+
+            <p>
+                For production code, you will want to add flags like <code>-gencode arch=compute_70,code=sm_70</code> to target a specific GPU architecture (replace <code>70</code> with the compute capability of your card). You can find your GPU's compute capability by running <code>nvidia-smi</code> and matching the device name to NVIDIA's documentation. The <code>-O2</code> or <code>-O3</code> optimization flags work as they do with <code>gcc</code>, enabling aggressive loop transformations and memory access optimizations that are crucial for performance on the GPU.
+            </p>
+        </section>
+
+        <section id="first-program">
+            <h2>3. Writing a CUDA Program: The First Example</h2>
+
+            <p>
+                We will begin with the "hello world" of parallel computing: vector addition. Given two arrays of floating-point numbers, <code>A</code> and <code>B</code>, your task is to produce a third array, <code>C</code>, where each element is the sum of the corresponding elements in <code>A</code> and <code>B</code> — that is, <code>C[i] = A[i] + B[i]</code>. This problem is beautifully simple because every element is independent: computing <code>C[0]</code> does not require knowing <code>C[1]</code>, and so you can compute all elements simultaneously. That independence is exactly what makes it an ideal first CUDA program.
+            </p>
+
+            <p>
+                In a traditional C program, you would write a loop that iterates from <code>0</code> to <code>N-1</code>, performing the addition one element at a time. In CUDA, you write a special function called a <em>kernel</em> that operates on a single element, and then you instruct the GPU to launch thousands of instances of that kernel — one per element — on thousands of threads. The GPU handles the scheduling, the execution, and the synchronization.
+            </p>
+
+            <h3>The Code, Explained Step by Step</h3>
+
+            <p>Take a moment to read the following code in its entirety. Resist the urge to scan quickly; every line serves a purpose that will be unpacked in prose below.</p>
+
+            <pre><code class="language-cuda">#include &lt;stdio.h&gt;
+
+// A kernel is a function that runs on the GPU.
+// The __global__ qualifier tells the compiler:
+//   - This function is callable from the host (CPU).
+//   - It executes on the device (GPU).
+__global__
+void vector_add(const float* A, const float* B, float* C, int N) {
+    // Each thread computes its own global index.
+    // This maps every thread to one unique element.
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Guard against out-of-bounds access if N
+    // is not a multiple of the block size.
+    if (idx < N) {
+        C[idx] = A[idx] + B[idx];
+    }
+}
+
+int main() {
+    // Number of elements in each vector.
+    int N = 1024;
+
+    // Size in bytes.
+    size_t bytes = N * sizeof(float);
+
+    // --- Host-side allocation ---
+    float *h_A, *h_B, *h_C;
+    h_A = (float*)malloc(bytes);
+    h_B = (float*)malloc(bytes);
+    h_C = (float*)malloc(bytes);
+
+    // Initialize input vectors on the host.
+    for (int i = 0; i < N; ++i) {
+        h_A[i] = (float)i;
+        h_B[i] = (float)(i * 2);
+    }
+
+    // --- Device-side allocation ---
+    // These pointers live in GPU memory (global memory).
+    float *d_A, *d_B, *d_C;
+    cudaMalloc((void**)&d_A, bytes);
+    cudaMalloc((void**)&d_B, bytes);
+    cudaMalloc((void**)&d_C, bytes);
+
+    // --- Transfer data from host to device ---
+    cudaMemcpy(d_A, h_A, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, h_B, bytes, cudaMemcpyHostToDevice);
+
+    // --- Launch configuration ---
+    // We choose 256 threads per block.
+    const int threads_per_block = 256;
+    // The number of blocks needed to cover N elements.
+    int blocks_per_grid = (N + threads_per_block - 1) / threads_per_block;
+
+    // Launch the kernel!
+    //   <<<blocks_per_grid, threads_per_block>>>
+    // describes the execution configuration.
+    vector_add&lt;&lt;&lt;blocks_per_grid, threads_per_block&gt;&gt;&gt;(d_A, d_B, d_C, N);
+
+    // --- Transfer result back to host ---
+    cudaMemcpy(h_C, d_C, bytes, cudaMemcpyDeviceToHost);
+
+    // --- Cleanup ---
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+    free(h_A);
+    free(h_B);
+    free(h_C);
+
+    // Print a few results to verify correctness.
+    printf("Result[0..4]: ");
+    for (int i = 0; i < 5; ++i) {
+        printf("%.1f ", h_C[i]);
+    }
+    printf("\n");
+
+    return 0;
+}</code></pre>
+
+            <p>
+                Let us walk through this program as if we were explaining it to a colleague who knows C but has never seen a GPU kernel. The program begins with a standard <code>include</code> of <code>&lt;stdio.h&gt;</code> because we still need <code>printf</code> on the host side. Then comes the truly novel part: the function <code>vector_add</code>, decorated with the keyword <code>__global__</code>. This is a <em>kernel function</em>. Unlike an ordinary C function, which is called and executed exactly once per invocation, a <code>__global__</code> function is designed to be executed by many threads in parallel on the GPU. The <code>__global__</code> specifier is one of several CUDA function type qualifiers; it tells the compiler that the function should be callable from the CPU but executed on the GPU.
+            </p>
+
+            <p>
+                Inside the kernel, the first line calculates an integer called <code>idx</code>. This expression, <code>blockIdx.x * blockDim.x + threadIdx.x</code>, is the canonical way to map each thread to a unique global index in your data. The names <code>blockIdx</code>, <code>blockDim</code>, and <code>threadIdx</code> are built-in variables that exist inside every CUDA kernel. Think of them as the thread's coordinates in the execution grid: <code>blockIdx</code> tells you which block the thread belongs to, <code>blockDim</code> tells you how many threads are in each block, and <code>threadIdx</code> tells you the thread's position within its block. Adding them together gives you a number that ranges from <code>0</code> to <code>N-1</code>, assuming you have launched enough threads to cover your data. This mapping is so fundamental that you will see it in almost every CUDA tutorial; memorize it, and you have taken your first real step into GPU programming.
+            </p>
+
+            <p>
+                The <code>if</code> check around the actual computation is a guard. In practice, you often launch more threads than strictly necessary because GPUs prefer thread counts that are multiples of the warp size (typically 32). The guard ensures that any threads that fall off the end of the array do not attempt to read or write out-of-bounds memory, which would cause undefined behavior.
+            </p>
+
+            <p>
+                Turning our attention to <code>main</code>, we see a structure that is recognizably C. We allocate memory on the host using <code>malloc</code>, initialize two vectors, and then — here is where CUDA diverges — we allocate memory on the <em>device</em> using <code>cudaMalloc</code>. The <code>d_A</code>, <code>d_B</code>, and <code>d_C</code> pointers do not point to ordinary CPU memory; they point to memory physically located on the GPU. This is a critical distinction. Google spent years optimizing for data locality; you should do the same.
+            </p>
+
+            <p>
+                To get the data into a place where the GPU can work with it, we copy it from host to device using <code>cudaMemcpy</code>. The third argument, <code>cudaMemcpyHostToDevice</code>, specifies the direction of the transfer. The function knows which direction to move data because the source and destination pointers live in different address spaces; one is managed by the operating system in CPU RAM, the other by the CUDA driver in GPU VRAM.
+            </p>
+
+            <p>
+                The most visually distinctive line is the kernel launch:
+            </p>
+
+            <pre><code class="language-cuda">vector_add&lt;&lt;&lt;blocks_per_grid, threads_per_block&gt;&gt;&gt;(d_A, d_B, d_C, N);</code></pre>
+
+            <p>
+                The triple angle brackets, <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code>, are CUDA's way of specifying the <em>execution configuration</em>. Between the brackets, you tell the runtime how you want the work divided. The first number is the number of <em>blocks</em> in the <em>grid</em>, and the second number is the number of <em>threads</em> per block. In our example, if <code>N</code> is 1024 and we chose 256 threads per block, then <code>blocks_per_grid</code> becomes 4. We are therefore telling the GPU to execute the kernel with 4 blocks of 256 threads each, totaling 1024 threads — one per element. When the kernel runs, every one of those 1024 threads executes the body of <code>vector_add</code> simultaneously, each with a different value of <code>idx</code>.
+            </p>
+
+            <p>
+                After the kernel completes, we copy the result back to the host using <code>cudaMemcpy</code> with <code>cudaMemcpyDeviceToHost</code>. We then free all device memory with <code>cudaFree</code> and host memory with <code>free</code>. The program ends by printing the first few elements of <code>C</code> to verify that the addition worked correctly. If you see <code>2.0 4.0 6.0 8.0 10.0</code>, you have success.
+            </p>
+        </section>
+
+        <section id="execution-model">
+            <h2>4. How CUDA Programs Are Executed: A Deep Comparison</h2>
+
+            <p>
+                To truly understand CUDA, you need to replace your sequential mental model with a hierarchical, spatial one. In normal C programming, execution is linear: instruction one, then instruction two, then instruction three, all on a single control flow path. Even with OpenMP or pthreads, the model is fundamentally one of a small number of threads that may occasionally run in parallel. CUDA is different in both scale and architecture. It is helpful to contrast the two models directly, because every misconception a new CUDA programmer has usually stems from trying to shoehorn GPU concepts into CPU-shaped intuition.
+            </p>
+
+            <h3>The Thread Hierarchy: Grids, Blocks, and Warps</h3>
+
+            <p>
+                When you launch a CUDA kernel, you are launching a <em>grid</em> of threads. A grid is a collection of <em>thread blocks</em>. Each thread block is a collection of <em>threads</em>. Think of it like a two-dimensional array: the grid has rows and columns of blocks, and each block has rows and columns of threads. For simplicity, the example above uses one-dimensional indexing, but CUDA supports up to three dimensions for both blocks and threads, which can be convenient for image processing or matrix computations where you literally want rows and columns.
+            </p>
+
+            <p>
+                The actual unit of execution on the hardware is the <em>warp</em>. A warp is a group of 32 threads that the hardware executes in lockstep. When the GPU scheduler picks a warp to run, it issues the same instruction to all 32 threads simultaneously. This is why CUDA is so efficient at data-parallel work: the hardware is designed to broadcast one instruction to many data elements at once. However, this lockstep execution is also the source of a phenomenon called <em>divergence</em>. If different threads within the same warp take different branches of an <code>if</code>-statement, the hardware serializes the branches: it executes the <em>true</em> path for the threads that need it, then the <em>false</em> path for the others, masking off the inactive threads each time. Divergence is one of the first performance pitfalls you will encounter, and learning to avoid it is part of developing the CUDA mindset.
+            </p>
+
+            <div class="mermaid">
+                graph TD
+                    A["Grid<br>Entire computation"] --> B["Block 0"]
+                    A --> C["Block 1"]
+                    A --> D["Block 2"]
+                    B --> E["Warp 0<br>(32 threads)"]
+                    B --> F["Warp 1"]
+                    C --> G["Warp 2"]
+                    C --> H["Warp 3"]
+                    style A fill:#0d47a1,color:#fff,stroke:#0d47a1
+                    style B fill:#e3f2fd,stroke:#0d47a1
+                    style C fill:#e3f2fd,stroke:#0d47a1
+                    style D fill:#e3f2fd,stroke:#0d47a1
+            </div>
+
+            <h3>Memory Spaces: A House with Many Rooms</h3>
+
+            <p>
+                In C, you are used to thinking about memory as one large flat array called "RAM," possibly organized into the stack and the heap. CUDA is not so simple. When you write a CUDA program, you are managing multiple distinct memory spaces, each with its own speed, size, and lifetime. Understanding these spaces is not optional; it is the difference between a program that runs correctly and a program that runs fast.
+            </p>
+
+            <p>
+                At the top level, there is <strong>host memory</strong> (your CPU RAM) and <strong>device memory</strong> (the GPU's VRAM). These are physically separate chips connected by the PCIe bus. Moving data between them is necessary but expensive. A modern PCIe 4.0 x16 link might offer around 32 GB/s of bandwidth, whereas the internal memory bandwidth of a modern GPU can exceed 2 TB/s. The ratio is staggering: the GPU can consume data from its own memory hundreds of times faster than it can receive it from the CPU. This is why you should always think twice before moving data back and forth.
+            </p>
+
+            <p>
+                Within the device itself, there are several tiers. <strong>Global memory</strong> is the largest, slowest, and most visible to the programmer. It is what you get when you call <code>cudaMalloc</code>. It is accessible by all threads and persists for the lifetime of the allocation. <strong>Shared memory</strong> is a small, extremely fast on-chip memory that is shared among threads within the same block. It is programmers' best friend for avoiding repeated reads from global memory. <strong>Registers</strong> are the fastest memory of all, private to each thread, and allocated statically by the compiler. Finally, there is <strong>local memory</strong>, which is actually a misnomer: it is a region of global memory used as an overflow area when a kernel uses too many registers or when arrays are too large for shared memory. Despite the name, it is not fast.
+            </p>
+
+            <div class="card card-warning">
+                <strong>An important warning about initialization</strong>
+                <p>
+                    Unlike <code>malloc</code>, which may or may not zero-initialize memory, <code>cudaMalloc</code> does <em>not</em> initialize the memory it allocates. The contents of <code>d_A</code>, <code>d_B</code>, and <code>d_C</code> after <code>cudaMalloc</code> are undefined. Always ensure that you write to every byte of a <code>cudaMalloc</code>'d region before reading from it, or use <code>cudaMemset</code> to initialize. In our vector addition example, we initialize the host vectors, copy them to the device, compute the result, and copy back. We never read from device memory that we have not explicitly written to.
+                </p>
+            </div>
+
+            <h3>Execution Flow: CPU vs GPU at a Glance</h3>
+
+            <p>
+                Consider how the two processors interact during a typical CUDA program. The CPU begins by running the <code>main</code> function. It allocates host memory, initializes data, allocates device memory, copies data to the device, and then issues the kernel launch. When the CPU calls the kernel launch — note that this call itself is non-blocking from the host's perspective — it returns immediately, allowing the host to continue executing subsequent host code unless you explicitly synchronize.
+            </p>
+
+            <p>
+                Meanwhile, the GPU has received the kernel launch as a work descriptor. The GPU driver queues the grid of thread blocks. The hardware scheduler then picks one or more warps from one or more blocks and dispatches them to the streaming multiprocessors (SMs), which are the physical execution units on the chip. An SM can run several warps concurrently, switching between them when one stalls on a memory access. This is called <em>latency hiding</em>: while one warp is waiting for data to arrive from global memory, the SM can execute instructions from another warp that is ready. A well-optimized CUDA program keeps every SM busy with enough warps to hide the latency of memory operations.
+            </p>
+
+            <div class="mermaid">
+                sequenceDiagram
+                    participant H as Host (CPU)
+                    participant B as PCIe Bus
+                    participant D as Device (GPU)
+                    H->>B: cudaMemcpy (Host→Device)
+                    B->>D: Data in H2D
+                    H->>D: kernel<<<>>>
+                    D->>D: Launch grid of blocks
+                    loop For each block/warp
+                        D->>D: Execute threads in lockstep
+                    end
+                    H->>B: cudaMemcpy (Device→Host)
+                    B->>H: Result data
+                    H->>H: Verify and exit
+            </div>
+
+            <p>
+                Once the kernel has finished executing, the result resides in device global memory. The host then copies it back to CPU RAM, where the CPU can print it, process it further, or write it to disk. If your program has many kernels to launch, you might keep data on the device between launches, copying back to the host only at the very end. This pipeline pattern — copy in, compute, copy out — is the backbone of most CUDA applications, and minimizing the time spent in the copy phases is one of the central optimizations you will learn.
+            </p>
+        </section>
+
+        <section id="mental-model">
+            <h2>5. Advice on Mental Models: How to Be Successful with CUDA Programming</h2>
+
+            <p>
+                Learning CUDA is not just a matter of learning a new API. It is a matter of learning a new way to think about problems. If you approach CUDA the same way you approach a CPU program, you will write code that runs, but it will run slowly, and you will be confused about why. Here are several mental models and habits that, if adopted early, will save you months of frustration.
+            </p>
+
+            <p>
+                <strong>Think in terms of embarrassingly parallel data.</strong> Before you write a single line of CUDA code, ask yourself: can my problem be broken into hundreds or thousands of independent pieces? Vector addition is embarrassingly parallel because every element is independent. Matrix multiplication is slightly less so, but still highly parallel. Sorting a linked list is not embarrassingly parallel, and trying to sort it directly on a GPU without deep knowledge of algorithms and memory hierarchies will teach you humility. The first filter for any candidate problem is: how many independent sub-problems are there?
+            </p>
+
+            <p>
+                <strong>Embrace the tyranny of memory bandwidth.</strong> On a CPU, memory bandwidth is often plenty. You can execute a floating-point operation on data that is probably already in cache, and if it is not, the penalty is a few dozen cycles. On a GPU, arithmetic is cheap compared to memory access. A single global memory transaction might take hundreds of cycles. If your kernel reads a value from global memory, uses it to compute a result, and writes it back, and if that pattern repeats millions of times, the cost of the memory accesses will utterly dominate. The GPU can perform many flops (floating-point operations) for every byte it reads; your job is to give it enough work per byte to justify the trip to memory. This is called <em>arithmetic intensity</em>, and increasing it is the art of CUDA optimization.
+            </p>
+
+            <p>
+                <strong>Structure your data linearly.</strong> CPUs are kind to scattered memory; they have complex prefetchers and deep cache hierarchies. GPUs prefer coalesced memory access: when 32 threads in a warp read 32 consecutive 4-byte floats, the hardware can satisfy all 32 requests with a single 128-byte transaction. If those threads instead read from addresses that are scattered across memory, the hardware must issue 32 separate transactions, and your bandwidth drops by a factor of thirty-two. Always arrange your data so that threads with consecutive indices access consecutive addresses. For arrays of structures, consider structures of arrays (SoA) instead of arrays of structures (AoS).
+            </p>
+
+            <p>
+                <strong>Do not fear the blank page; fear the blank performance profile.</strong> CPU debugging is about correctness: "Does it crash? Does it produce the right answer?" GPU debugging is about performance: "Why is it running at 1% of peak?" The CUDA ecosystem includes profilers like <code>ncu</code> (NVIDIA Nsight Compute) that will tell you exactly where cycles are being spent. Use them early. Before you try to tune a kernel, measure it. Before you worry about shared memory, verify that global memory coalescing is optimal. Performance optimization on the GPU is a layered problem, and you should solve the layers from the bottom up: first bandwidth, then occupancy, then instruction mix, then architecture-specific tuning.
+            </p>
+
+            <p>
+                <strong>Respect the asynchronous nature of the runtime.</strong> On the host, <code>cudaMemcpy</code> and kernel launches are asynchronous with respect to the host unless you explicitly synchronize. The CPU might continue executing host code while the GPU is still working. If you copy data back before the kernel has finished writing it, you will read garbage. Use <code>cudaDeviceSynchronize()</code> or stream synchronization to enforce ordering. During development, sprinkle <code>cudaDeviceSynchronize()</code> between major steps. In production, you will replace them with streams for maximum overlap, but correctness comes first.
+            </p>
+
+            <p>
+                <strong>Learn to love the error-checking boilerplate.</strong> Almost every <code>cudaMalloc</code>, <code>cudaMemcpy</code>, and kernel launch is a potential failure point. A kernel launch does not return an error code directly; it returns immediately, and any error is recorded for later retrieval by <code>cudaGetLastError()</code>. The following pattern will save you countless hours of debugging:
+            </p>
+
+            <pre><code class="language-cuda">cudaError_t err = cudaMalloc((void**)&d_A, bytes);
+if (err != cudaSuccess) {
+    fprintf(stderr, "Failed to allocate device memory: %s\n",
+            cudaGetErrorString(err));
+    return -1;
+}
+
+vector_add&lt;&lt;&lt;blocks, threads&gt;&gt;&gt;(d_A, d_B, d_C, N);
+err = cudaGetLastError();
+if (err != cudaSuccess) {
+    fprintf(stderr, "Kernel launch failed: %s\n",
+            cudaGetErrorString(err));
+    return -1;
+}</code></pre>
+
+            <p>
+                If you skip error checking and a <code>cudaMalloc</code> fails because you are out of VRAM, the subsequent kernel launch will fail silently, and you might spend hours looking at the kernel logic instead of the allocation problem. Always check errors. Always.
+            </p>
+        </section>
+
+        <section id="projects">
+            <h2>6. Beginning Project Ideas</h2>
+
+            <p>
+                The best way to internalize CUDA is to build things. The following projects are ordered roughly by difficulty, and each isolates a specific concept that you should master before moving to the next. Do not skip them.
+            </p>
+
+            <div class="project-grid">
+                <div class="project-card">
+                    <h4>1. Parallel Histogram</h4>
+                    <p>Given an array of grayscale pixel values (0–255), count how many pixels fall into each brightness bin. This teaches you atomic operations, a fundamental tool for combining results from concurrent threads without races.</p>
+                </div>
+                <div class="project-card">
+                    <h4>2. Image Brightness / Contrast</h4>
+                    <p>Load a PPM or BMP image, apply a brightness or contrast adjustment, and write the result to a file. Every pixel is independent, so it is embarrassingly parallel. It teaches you file I/O, 2D thread indexing, and texture memory.</p>
+                </div>
+                <div class="project-card">
+                    <h4>3. Matrix Transpose</h4>
+                    <p>Transpose a large matrix stored in row-major order. This is the classic teaching exercise for understanding shared memory and bank conflicts. Naive implementations are correct but slow; optimizing them teaches you to think about data movement.</p>
+                </div>
+                <div class="project-card">
+                    <h4>4. Reduction (Parallel Sum)</h4>
+                    <p>Given a large array, compute its sum using a tree-based parallel reduction. This is the building block for almost every other algorithm (norm, dot product, average). It teaches you synchronization within a block and tree-structured parallelism.</p>
+                </div>
+                <div class="project-card">
+                    <h4>5. Conway's Game of Life</h4>
+                    <p>Simulate cellular automata on a large 2D grid. It is benign enough that your first implementation will work, but optimizing it for boundary conditions and shared memory tiling will stretch you.</p>
+                </div>
+                <div class="project-card">
+                    <h4>6. CPU-GPU Benchmark Harness</h4>
+                    <p>Write a framework that times the same operation (say, vector addition or saxpy) on the CPU using OpenMP and on the GPU using CUDA. This teaches you to measure, profile, and develop the intuition for when a GPU is worth using.</p>
+                </div>
+            </div>
+
+            <p>
+                When you start a project, write the CPU version first. It is your oracle: it tells you what the correct answer should be. Then write the GPU version. Compare the answers element by element. If they differ, your first suspicion should be a memory bug — out-of-bounds access, an uninitialized pointer, a mismatch in copy direction. Once correctness is established, profile. Find the bottleneck. Is it memory bandwidth? Is it occupancy? Is it divergence? Fix the worst problem first, measure again, and repeat. This iterative loop of <em>correct, profile, optimize, measure</em> is the metabolism of great CUDA programmers.
+            </p>
+
+            <div class="nav-buttons">
+                <a class="cta" href="#what-is-cuda">Back to top</a>
+                <a class="cta" href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/" target="_blank" rel="noopener">NVIDIA CUDA C Programming Guide</a>
+            </div>
+        </section>
+
+        <footer>
+            <p>This tutorial was crafted for C programmers beginning their journey into GPU computing. May your kernels be coalesced and your warps fully occupied.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Mermaid diagrams
+        mermaid.initialize({ startOnLoad: true, theme: 'default', themeVariables: { fontSize: '16px' } });
+
+        // Initialize Highlight.js for syntax highlighting
+        hljs.highlightAll();
+
+        // Smooth scroll for TOC links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Active TOC highlighting on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('nav.toc ul li a');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.style.background = '';
+                        if (link.getAttribute('href') === '#' + entry.target.id) {
+                            link.style.background = '#bbdefb';
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px' });
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
