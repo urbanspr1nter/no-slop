@@ -58,15 +58,10 @@ async def main():
     if args.session_resume:
         print(f"Resuming session: {args.session_resume}")
 
-    system_prompt += f"""
-
-# Session Information:
-
-- The current workspace directory: {config.workspace}
-- The current date (YYYY-MM-dd): {datetime.datetime.today().strftime('%Y-%m-%d')}
-
-Your workspace directory is where you can write files and create directories, etc. Look at the file system tools descriptions for more guidance on that. Otherwise, for read operations, you are not restricted to operating within the workspace directory.
-"""
+    system_prompt = system_prompt.replace("{{workspace_dir}}", config.workspace, 1)
+    system_prompt = system_prompt.replace(
+        "{{current_date}}", datetime.datetime.today().strftime("%Y-%m-%d")
+    )
 
     print(f"<system_prompt>\n{system_prompt}\n</system_prompt>")
 
