@@ -23,7 +23,7 @@ async def stream(provider: LlmProvider, context: list) -> list:
     )
 
     response = await client.responses.create(
-        timeout=provider.timeout,
+        timeout=int(provider.timeout),
         model=provider.model_id,
         input=context,
         tools=TOOL_SET,

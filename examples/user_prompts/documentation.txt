@@ -7,6 +7,7 @@ Write a tutorial or documentation about: {{description}}
     - Use the available search and scrape tools to validate.
     - You may also use shell exec to curl to confirm the remote resource exists.
 - Feel free to create mermaid diagrams and syntax highlighted code to create visual demonstrations
+- If math or scientific formulas may be involved, you can use LaTeX libraries like mathjax. 
 
 # Writing Style
 
