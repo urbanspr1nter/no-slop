@@ -19,6 +19,24 @@ Write a tutorial or documentation about: {{description}}
 
 If references are used, always cite the sources with their links at the end of the tutorial in a separate section.
 
+# Review Pass
+
+Upon completion of the request tutorial/documentation, perform a thorough pass for:
+
+- Fact-checking (check for misguided, hallucinated or non-factual claims)
+- Ensure all references or links displayed do not result in a dead page (404).
+- Check all syntax. This means any HTML/CSS/JS/mermaid syntax/LaTeX.
+
+# Process
+
+Always follow this process:
+
+- Understand the requirements.
+- Plan and research by using internal knowledge, web search and web page scraping.
+- Generate the tutorial/documentation, save the file.
+- Perform the review pass and edit the file for any necessary corrections/adjustments.
+- Deliver the final file as a response to the user.
+
 # Output
 
 Output the artifact to: {{output_path}}
