@@ -238,7 +238,7 @@ SHELL_TOOLS = [
                 "arguments": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "List of arguments including the switches and options.",
+                    "description": "List of arguments including the switches and options. Pass as literally array of strings.",
                 },
                 "env": {
                     "type": "object",

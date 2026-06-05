@@ -4,6 +4,7 @@ import tools.shell as shell
 import tools.glob_tool as glob_tool
 import tools.file_edit_and_show_diff as edit
 import tools.web_search_and_scrape as web
+import json
 
 
 def call_tool(tool_name: str, args: dict):
@@ -63,8 +64,8 @@ def call_tool(tool_name: str, args: dict):
     elif tool_name == "shell_exec_sync":
         result = shell.shell_exec_sync(
             program=args.get("program", ""),
-            arguments=args.get("arguments", []),
-            env=args.get("env", {}),
+            arguments=json.loads(args.get("arguments", "[]")),
+            env=json.loads(args.get("env", "{}")),
             timeout=args.get("timeout", 120),
         )
     elif tool_name == "file_edit_and_show_diff":

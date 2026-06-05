@@ -28,7 +28,7 @@ def shell_exec_sync(
 
     try:
         result = subprocess.run(
-            [program, *arguments],
+            ['/bin/bash', '-c', f'{program} "$@"', "--", *arguments],
             capture_output=True,
             text=True,
             timeout=int(timeout),

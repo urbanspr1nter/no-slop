@@ -1,5 +1,7 @@
 import os
 import argparse
+import platform
+import json
 import datetime
 from pathlib import Path
 from prompt_toolkit import prompt
@@ -21,6 +23,22 @@ NO_SLOP_DIRECTORY = ".noslop"
 def init():
     create_noslop_path_idem()
 
+def get_platform_information():
+    result = {
+        "machine_arch": platform.machine(),
+        "platform": platform.platform(),
+
+    }
+    if platform.freedesktop_os_release():
+        info = dict(platform.freedesktop_os_release())
+
+        result = {
+            **result,
+            "distribution_name": info["NAME"],
+            "version": info["VERSION"]
+        }
+
+    return result
 
 async def main():
     init()
@@ -64,12 +82,15 @@ async def main():
     system_prompt = system_prompt.replace(
         "{{current_date}}", datetime.datetime.today().strftime("%Y-%m-%d")
     )
+    system_prompt = system_prompt.replace("{{operating_system}}", json.dumps(get_platform_information(), indent=2))
 
     agent = StreamingAgent(config=config, session_id=args.session_resume)
     agent.set_system_prompt(system_prompt)
 
     if args.prompt:
-        user_request = args.prompt.strip()
+        user_request = f"""You are in headless mode. Fulfill the following:
+
+{args.prompt.strip()}"""
         if not user_request:
             return
 
