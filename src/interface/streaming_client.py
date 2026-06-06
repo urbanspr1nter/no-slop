@@ -23,11 +23,11 @@ NO_SLOP_DIRECTORY = ".noslop"
 def init():
     create_noslop_path_idem()
 
+
 def get_platform_information():
     result = {
         "machine_arch": platform.machine(),
         "platform": platform.platform(),
-
     }
     if platform.freedesktop_os_release():
         info = dict(platform.freedesktop_os_release())
@@ -35,10 +35,11 @@ def get_platform_information():
         result = {
             **result,
             "distribution_name": info["NAME"],
-            "version": info["VERSION"]
+            "version": info["VERSION"],
         }
 
     return result
+
 
 async def main():
     init()
@@ -82,7 +83,9 @@ async def main():
     system_prompt = system_prompt.replace(
         "{{current_date}}", datetime.datetime.today().strftime("%Y-%m-%d")
     )
-    system_prompt = system_prompt.replace("{{operating_system}}", json.dumps(get_platform_information(), indent=2))
+    system_prompt = system_prompt.replace(
+        "{{operating_system}}", json.dumps(get_platform_information(), indent=2)
+    )
 
     agent = StreamingAgent(config=config, session_id=args.session_resume)
     agent.set_system_prompt(system_prompt)
@@ -91,8 +94,6 @@ async def main():
         user_request = f"""You are in headless mode. Fulfill the following:
 
 {args.prompt.strip()}"""
-        if not user_request:
-            return
 
         await agent.step(user_request, headless=True)
     else:
