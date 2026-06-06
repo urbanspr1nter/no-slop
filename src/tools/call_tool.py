@@ -62,10 +62,18 @@ def call_tool(tool_name: str, args: dict):
 
         result = fs.fs_file_exists(filepath)
     elif tool_name == "shell_exec_sync":
+        arguments = args.get("arguments", [])
+        if type(arguments) is str:
+            arguments = json.loads(arguments)
+
+        env = args.get("env", {})
+        if type(env) is str:
+            env = json.loads(env)
+    
         result = shell.shell_exec_sync(
             program=args.get("program", ""),
-            arguments=json.loads(args.get("arguments", "[]")),
-            env=json.loads(args.get("env", "{}")),
+            arguments=arguments,
+            env=env,
             timeout=args.get("timeout", 120),
         )
     elif tool_name == "file_edit_and_show_diff":
