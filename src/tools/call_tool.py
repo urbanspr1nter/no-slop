@@ -38,8 +38,8 @@ def call_tool(tool_name: str, args: dict):
         y = args["y"]
         result = {"status": "ok", "result": ns_math.mod(x, y)}
     elif tool_name == "write_file":
-        filepath = args["filepath"]
-        content = args["content"]
+        filepath = args.get("filepath", "")
+        content = args.get("content", "")
         mode = args.get("mode", "w")
 
         result = fs.fs_write_file(filepath, content, mode)
@@ -69,7 +69,7 @@ def call_tool(tool_name: str, args: dict):
         env = args.get("env", {})
         if type(env) is str:
             env = json.loads(env)
-    
+
         result = shell.shell_exec_sync(
             program=args.get("program", ""),
             arguments=arguments,
