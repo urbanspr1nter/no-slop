@@ -67,11 +67,23 @@ def call_tool(tool_name: str, args: dict):
     elif tool_name == "shell_exec_sync":
         arguments = args.get("arguments", [])
         if type(arguments) is str:
-            arguments = json.loads(arguments)
+            try:
+                arguments = json.loads(arguments)
+            except:
+                return {
+                    "status": "failure",
+                    "reason": "arguments must be a valid array",
+                }
 
         env = args.get("env", {})
         if type(env) is str:
-            env = json.loads(env)
+            try:
+                env = json.loads(env)
+            except:
+                return {
+                    "status": "failure",
+                    "reason": "provide a valid dictionary of environment variable key-value pairs",
+                }
 
         result = shell.shell_exec_sync(
             program=args.get("program", ""),
