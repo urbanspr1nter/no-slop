@@ -9,5 +9,6 @@
         }
     },
     "workspace_default": ".",
-    "search_and_scrape_service_url": ""
+    "search_and_scrape_service_url": "",
+    "shell_timeout": 120
 }
