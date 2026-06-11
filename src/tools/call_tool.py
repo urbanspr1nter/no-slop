@@ -6,8 +6,11 @@ import tools.file_edit_and_show_diff as edit
 import tools.web_search_and_scrape as web
 import json
 
+from config.loader import load_config
+
 
 def call_tool(tool_name: str, args: dict):
+    config = load_config()
     result = {"status": "failure"}
 
     if tool_name == "sqrt":
@@ -74,7 +77,7 @@ def call_tool(tool_name: str, args: dict):
             program=args.get("program", ""),
             arguments=arguments,
             env=env,
-            timeout=args.get("timeout", 120),
+            timeout=args.get("timeout", config.shell_timeout),
         )
     elif tool_name == "file_edit_and_show_diff":
         result = edit.file_edit_and_show_diff(

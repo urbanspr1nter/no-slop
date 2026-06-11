@@ -13,6 +13,7 @@ class Config(BaseModel):
     timeout: int = 7200
     workspace: str = "."
     search_and_scrape_service_url: str = ""
+    shell_timeout: int = 120
 
 
 def load_config():
@@ -45,6 +46,7 @@ def load_config():
             _config.search_and_scrape_service_url = _loaded_config.get(
                 "search_and_scrape_service_url", ""
             )
+            _config.shell_timeout = _loaded_config.get("shell_timeout", 120)
 
             displayed_config = dict(_config)
             displayed_config["api_key"] = "[REDACTED]"
