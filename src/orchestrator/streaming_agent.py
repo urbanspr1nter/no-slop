@@ -134,13 +134,14 @@ class StreamingAgent:
                 # iterate through the tool calls
                 for tool_call in tool_call_queue:
                     name = tool_call["name"]
+                    id = tool_call["call_id"]
 
                     if not tool_call["arguments"]:
                         tool_call["arguments"] = "{}"
 
                     arguments = json.loads(tool_call["arguments"])
 
-                    result = call_tool(name, arguments)
+                    result = call_tool(tool_name=name, tool_call_id=id, args=arguments)
 
                     self._context_manager.append_context(
                         {

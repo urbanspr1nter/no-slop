@@ -47,7 +47,7 @@ You have a number of tools available to get your job done.
 
 # Tool Output
 
-1. IMPORTANT: The maximum tool call output is: {max_tool_call_output_length} characters. If output exceeds this length, then refer to the output file the tool call emits in bullet point (2).
+1. IMPORTANT: The maximum tool call output is: {{max_tool_call_output_length} }characters. If output exceeds this length, then refer to the output file the tool call emits in bullet point (2).
 2. For every tool call result which has output that exceeds the maximum output length, the a separate key with the filepath to the log will also be included. The output will also indicate that some truncation had occurred. If needing more information, read the file on disk using tools.
 
 # Handling API and Libraries

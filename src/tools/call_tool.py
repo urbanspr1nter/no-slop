@@ -1,6 +1,6 @@
 import tools.ns_math as ns_math
 import tools.fs as fs
-import tools.shell as shell
+from tools.shell import ShellExecSyncTool
 import tools.glob_tool as glob_tool
 import tools.file_edit_and_show_diff as edit
 import tools.web_search_and_scrape as web
@@ -8,8 +8,10 @@ import json
 
 from config.loader import load_config
 
+TOOL_INSTANCES = {"shell_exec_sync": ShellExecSyncTool()}
 
-def call_tool(tool_name: str, args: dict):
+
+def call_tool(tool_name: str, tool_call_id: str, args: dict):
     config = load_config()
     result = {"status": "failure"}
 
@@ -85,11 +87,14 @@ def call_tool(tool_name: str, args: dict):
                     "reason": "provide a valid dictionary of environment variable key-value pairs",
                 }
 
-        result = shell.shell_exec_sync(
+        shell_exec_sync_tool: ShellExecSyncTool = TOOL_INSTANCES["shell_exec_sync"]
+
+        result = shell_exec_sync_tool.invoke(
             program=args.get("program", ""),
             arguments=arguments,
             env=env,
             timeout=args.get("timeout", config.shell_timeout),
+            tool_call_id=tool_call_id,
         )
     elif tool_name == "file_edit_and_show_diff":
         result = edit.file_edit_and_show_diff(

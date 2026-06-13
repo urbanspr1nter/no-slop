@@ -87,7 +87,7 @@ async def main():
         "{{operating_system}}", json.dumps(get_platform_information(), indent=2)
     )
     system_prompt = system_prompt.replace(
-        "{{max_tool_call_output_length}}", config.max_tool_call_output_length
+        "{{max_tool_call_output_length}}", str(config.max_tool_call_output_length)
     )
 
     agent = StreamingAgent(config=config, session_id=args.session_resume)

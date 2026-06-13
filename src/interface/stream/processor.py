@@ -1,9 +1,7 @@
 from openai.types.responses import (
     ResponseStreamEvent,
-    ResponseFunctionToolCall,
 )
 from typing import Literal
-from tools.call_tool import call_tool
 
 
 def step(
