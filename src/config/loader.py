@@ -14,6 +14,8 @@ class Config(BaseModel):
     workspace: str = "."
     search_and_scrape_service_url: str = ""
     shell_timeout: int = 120
+    temp_path: str = "/tmp"
+    max_tool_call_output_length: int = 16384
 
 
 def load_config():
@@ -47,6 +49,10 @@ def load_config():
                 "search_and_scrape_service_url", ""
             )
             _config.shell_timeout = _loaded_config.get("shell_timeout", 120)
+            _config.temp_path = _loaded_config.get("temp_path", "/tmp")
+            _config.max_tool_call_output_length = _loaded_config.get(
+                "max_tool_call_output_length", _config.max_tool_call_output_length
+            )
 
             displayed_config = dict(_config)
             displayed_config["api_key"] = "[REDACTED]"
