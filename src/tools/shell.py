@@ -35,12 +35,12 @@ class ShellExecSyncTool(BaseTool):
         return abs_path
 
     def _truncate(self, call_id: str, **kwargs):
-        if not call_id:
-            return {"truncated": None, "full": {"stdout": stdout, "stderr": stderr}}
-
         config = load_config()
         stdout = kwargs.get("stdout", "")
         stderr = kwargs.get("stderr", "")
+
+        if not call_id:
+            return {"truncated": None, "full": {"stdout": stdout, "stderr": stderr}}
 
         truncated_stdout = truncate_with_label(
             stdout, max_length=config.max_tool_call_output_length

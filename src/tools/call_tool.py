@@ -4,11 +4,12 @@ from tools.shell import ShellExecSyncTool
 import tools.glob_tool as glob_tool
 import tools.file_edit_and_show_diff as edit
 import tools.web_search_and_scrape as web
+from tools.web_search_and_scrape import WebSearchTool
 import json
 
 from config.loader import load_config
 
-TOOL_INSTANCES = {"shell_exec_sync": ShellExecSyncTool()}
+TOOL_INSTANCES = {"shell_exec_sync": ShellExecSyncTool(), "web_search": WebSearchTool()}
 
 
 def call_tool(tool_name: str, tool_call_id: str, args: dict):
@@ -109,8 +110,12 @@ def call_tool(tool_name: str, tool_call_id: str, args: dict):
             recurse=args.get("recurse", False),
         )
     elif tool_name == "web_search":
-        result = web.web_search(
-            query=args.get("query", ""), limit=args.get("limit", 10)
+        web_search_tool: WebSearchTool = TOOL_INSTANCES["web_search"]
+
+        result = web_search_tool.invoke(
+            tool_call_id=tool_call_id,
+            query=args.get("query", ""),
+            limit=args.get("limit", 10),
         )
     elif tool_name == "web_page_scrape":
         result = web.web_page_scrape(url=args.get("url", ""))
