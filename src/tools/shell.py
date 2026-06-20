@@ -95,6 +95,11 @@ class ShellExecSyncTool(BaseTool):
                 "status": "failure",
                 "message": "No such file or directory. Program not found in PATH. Suggestion: Call this tool with a valid program with arguments as an array.",
             }
+        except subprocess.TimeoutExpired:
+            return {
+                "status": "failure",
+                "message": f"Shell command timeout expired. Specified timeout was: {timeout} seconds. Default is: {load_config().shell_timeout} seconds",
+            }
 
         truncate_result = self._truncate(
             call_id=tool_call_id, stdout=result.stdout, stderr=result.stderr
