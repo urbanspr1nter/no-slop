@@ -1,0 +1,25 @@
+DESCRIPTION: How C pointers work.
+OUTPUT PATH: pointers-tutorial.html
+REQUIREMENTS:
+
+Write a guide targeted towards a first year computer science student on how C pointers work.
+
+They have experience programming C but not super familiar with manual memory management.
+
+Scope should be:
+1. How memory addresses work.
+2. Difference between referencing vs dereferencing.
+3. LVALUE/RVALUE
+4. Double pointers
+
+And write about general intuition.
+
+Write in prose. Not bullet pointers.
+
+Output your document in very beautiful HTML/CSS/JS.
+
+Do not use generic LLM colors. Aim to look like artisanal technical manual with paper texture.
+
+Search the internet for most up-to-date information!
+
+Output file: pointers-tutorial.html
