@@ -94,6 +94,11 @@ def fs_read_file(filepath: str, mode: str = "r") -> dict:
         return {"status": "ok", "result": {"content": content}}
     except IOError as e:
         return {"status": "error", "result": f"Could not read the file: {real_path}"}
+    except UnicodeDecodeError:
+        return {
+            "status": "error",
+            "result": f"Could not read the file: {real_path}. Only text-based file reading is supported now.",
+        }
 
 
 def fs_make_directory(filepath: str, create_parent_if_not_exists: bool = False) -> dict:
