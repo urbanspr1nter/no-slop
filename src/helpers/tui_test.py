@@ -40,6 +40,8 @@ def tui_app(stdscr):
         if input_y < 1:
             input_y = 1
 
+        history_capacity = input_y - 1
+
         key = stdscr.getch()
 
         if key == ESCAPE_CHAR:
@@ -51,20 +53,21 @@ def tui_app(stdscr):
                 input_buffer.pop()
         elif is_enter_key(key):
             if input_buffer:
-                chat_history.append("".join(input_buffer))
+                chat_history.append("".join(input_buffer).strip())
                 input_buffer = []
 
-        for i, msg in enumerate(chat_history):
+        visible_messages = chat_history[-history_capacity:]
+        for i, msg in enumerate(visible_messages):
             if i < input_y:
                 try:
-                    stdscr.addstr(i, 0, msg)
+                    stdscr.addstr(i, 0, msg[: width - 1])
                 except curses.error:
                     pass
 
         input_text = "".join(input_buffer)
 
         try:
-            stdscr.addstr(input_y, 0, f"@ {input_text}")
+            stdscr.addstr(input_y, 0, f"@ {input_text}"[: width - 1])
         except curses.error:
             pass
 
