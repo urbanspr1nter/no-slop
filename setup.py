@@ -11,5 +11,6 @@ setup(
         "textual-dev",
         "pydantic",
         "prompt_toolkit",
+        "httpx",
     ],
 )
