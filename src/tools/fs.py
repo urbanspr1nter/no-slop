@@ -1,168 +1,200 @@
 import os
-from pathlib import Path
-from utils.path_utils import make_real_path
-from config.loader import load_config
 
-HOME_DIRECTORY = str(Path.home())
-
-BLOCKED_PATHS: set[str] = {
-    f"{HOME_DIRECTORY}/.bashrc",
-    f"{HOME_DIRECTORY}/.bash_profile",
-}
+from tools.base_tool import BaseTool
+from tools.helpers import ToolError, err, guarded_path, ok
 
 WRITE_MODE_SET = {"r", "w", "x", "a", "t", "+"}
-READ_MODE_SET = {"r", "w", "x", "a", "b", "t", "+"}
+READ_MODE_SET = WRITE_MODE_SET | {"b"}
 
 
-def _is_blocked_path(filepath: str) -> bool:
-    if filepath.strip() in BLOCKED_PATHS:
-        return True
-    else:
-        return False
+def _sanitize_mode(mode: str, is_write: bool = False) -> str:
+    """Keep only the mode characters Python's open() actually understands."""
+    mode_set = WRITE_MODE_SET if is_write else READ_MODE_SET
+    return "".join(c for c in mode if c in mode_set)
 
 
-def _validate_is_workspace_path(filepath: str) -> bool:
-    config = load_config()
+class WriteFileTool(BaseTool):
+    name = "write_file"
+    description = (
+        "Writes a file with contents given a filepath. Can only write within the "
+        "workspace directory."
+    )
+    parameters = {
+        "type": "object",
+        "properties": {
+            "filepath": {
+                "type": "string",
+                "description": (
+                    "filepath. parent relative paths will be resolved automatically. "
+                    "path must include the workspace directory."
+                ),
+            },
+            "content": {
+                "type": "string",
+                "description": "contents to write to the file",
+            },
+            "mode": {
+                "type": "string",
+                "description": "file operation mode. default: 'w'.",
+            },
+        },
+        "required": ["filepath", "content"],
+    }
 
-    if not make_real_path(filepath).startswith(make_real_path(config.workspace)):
-        return False
+    def invoke(self, **kwargs) -> dict:
+        filepath = kwargs.get("filepath", "")
+        content = kwargs.get("content", "")
+        mode = kwargs.get("mode", "w")
 
-    return True
+        try:
+            real_path = guarded_path(filepath, require_workspace=True)
+        except ToolError as e:
+            return err(str(e))
 
+        try:
+            with open(real_path, _sanitize_mode(mode, is_write=True)) as f:
+                bytes_written = f.write(content)
+        except IOError:
+            return err(f"Could not write the file: {real_path}")
 
-def _sanitize_mode(mode: str, is_write: bool = False):
-    result = ""
-
-    MODE_SET = WRITE_MODE_SET if is_write else READ_MODE_SET
-
-    for c in mode:
-        if c in MODE_SET:
-            result += c
-
-    return result
-
-
-def fs_write_file(filepath: str, content: str, mode: str = "w") -> dict:
-    """Writes a file with contents given a filepath within the configured workspace directory.
-
-    Default mode is w (write).
-
-    Returns
-        - Information about the number of bytes written.
-    """
-    config = load_config()
-
-    real_path = make_real_path(filepath)
-
-    if _is_blocked_path(real_path):
-        return {"status": "failure", "message": f"{real_path} is not allowed."}
-
-    if not _validate_is_workspace_path(real_path):
-        return {
-            "status": "failure",
-            "message": f"You are only allowed to write files in the workspace directory. Current workspace directory: {config.workspace}.",
-        }
-
-    bytes_written = 0
-    try:
-        with open(real_path, _sanitize_mode(mode, is_write=True)) as f:
-            bytes_written = f.write(content)
-
-        return {"status": "ok", "result": {"bytes_written": bytes_written}}
-    except IOError as e:
-        return {"status": "error", "result": f"Could not write the file: {real_path}"}
+        return ok({"bytes_written": bytes_written})
 
 
-def fs_read_file(filepath: str, mode: str = "r") -> dict:
-    """Reads a file and gets contents as a string given the filepath.
+class ReadFileTool(BaseTool):
+    name = "read_file"
+    description = "Reads a file and gets contents as a string given the filepath."
+    parameters = {
+        "type": "object",
+        "properties": {
+            "filepath": {
+                "type": "string",
+                "description": "filepath. parent relative paths will be resolved automatically.",
+            },
+            "mode": {
+                "type": "string",
+                "description": "file operation mode. default: 'r'.",
+            },
+        },
+        "required": ["filepath"],
+    }
 
-    Default mode is "r" (read).
+    def invoke(self, **kwargs) -> dict:
+        filepath = kwargs.get("filepath", "")
+        mode = kwargs.get("mode", "r")
 
-    Returns:
-        - Information including contents of the file at given filepath.
-    """
-    real_path = make_real_path(filepath)
+        try:
+            real_path = guarded_path(filepath, require_workspace=False)
+        except ToolError as e:
+            return err(str(e))
 
-    if _is_blocked_path(real_path):
-        return {"status": "failure", "message": f"{real_path} is not allowed."}
+        try:
+            with open(real_path, _sanitize_mode(mode)) as f:
+                content = f.read()
+        except IOError:
+            return err(f"Could not read the file: {real_path}")
+        except UnicodeDecodeError:
+            return err(
+                f"Could not read the file: {real_path}. "
+                "Only text-based file reading is supported now."
+            )
 
-    content = ""
-    try:
-        with open(real_path, _sanitize_mode(mode)) as f:
-            content = f.read()
-
-        return {"status": "ok", "result": {"content": content}}
-    except IOError as e:
-        return {"status": "error", "result": f"Could not read the file: {real_path}"}
-    except UnicodeDecodeError:
-        return {
-            "status": "error",
-            "result": f"Could not read the file: {real_path}. Only text-based file reading is supported now.",
-        }
-
-
-def fs_make_directory(filepath: str, create_parent_if_not_exists: bool = False) -> dict:
-    """Creates a directory at the filepath within the workspace directory.
-
-    Returns:
-        - Information and filepath of the directory created.
-    """
-    config = load_config()
-
-    real_path = make_real_path(filepath)
-
-    if _is_blocked_path(real_path):
-        return {"status": "failure", "message": f"{real_path} is not allowed."}
-
-    if not _validate_is_workspace_path(real_path):
-        return {
-            "status": "failure",
-            "message": f"You are only allowed to create directories within the workspace directory. Current workspace directory: {config.workspace}",
-        }
-
-    try:
-        if create_parent_if_not_exists:
-            os.makedirs(real_path, exist_ok=True)
-        else:
-            os.mkdir(real_path)
-
-        return {"status": "ok", "result": f"Created directory at: {real_path}"}
-
-    except Exception as e:
-        return {"status": "error", "result": f"Could not make directory: {real_path}"}
+        return ok({"content": content})
 
 
-def fs_list_directory(filepath: str) -> dict:
-    """Gets the filenames within the given path.
+class MakeDirectoryTool(BaseTool):
+    name = "make_directory"
+    description = (
+        "Creates a directory at the filepath. Can only create directories within "
+        "the workspace directory."
+    )
+    parameters = {
+        "type": "object",
+        "properties": {
+            "filepath": {
+                "type": "string",
+                "description": (
+                    "filepath. parent relative paths will be resolved automatically. "
+                    "path must include the workspace directory."
+                ),
+            },
+            "create_parent_if_not_exists": {
+                "type": "boolean",
+                "description": "Create all parent directories if true. Default false.",
+            },
+        },
+        "required": ["filepath"],
+    }
 
-    Returns:
-        - Information about the list of filenames at the current directory.
-    """
-    real_path = make_real_path(filepath)
+    def invoke(self, **kwargs) -> dict:
+        filepath = kwargs.get("filepath", "")
+        create_parent_if_not_exists = kwargs.get("create_parent_if_not_exists", False)
 
-    if _is_blocked_path(real_path):
-        return {"status": "failure", "message": f"{real_path} is not allowed."}
+        try:
+            real_path = guarded_path(filepath, require_workspace=True)
+        except ToolError as e:
+            return err(str(e))
 
-    if not os.path.exists(real_path):
-        return {"status": "error", "result": f"Path does not exist: {real_path}"}
+        try:
+            if create_parent_if_not_exists:
+                os.makedirs(real_path, exist_ok=True)
+            else:
+                os.mkdir(real_path)
+        except Exception:
+            return err(f"Could not make directory: {real_path}")
 
-    dirs = os.listdir(real_path)
-    dirs = list(filter(lambda x: x not in ["..", "."], dirs))
-
-    return {"status": "ok", "result": dirs}
+        return ok(f"Created directory at: {real_path}")
 
 
-def fs_file_exists(filepath: str) -> dict:
-    """Checks if the file exists specified by the filepath.
+class ListDirectoryTool(BaseTool):
+    name = "list_directory"
+    description = "Gets the filenames at the current directory specified by the filepath."
+    parameters = {
+        "type": "object",
+        "properties": {
+            "filepath": {
+                "type": "string",
+                "description": "filepath. parent relative paths will be resolved automatically.",
+            }
+        },
+        "required": ["filepath"],
+    }
 
-    Returns:
-        - Information if the file exists.
-    """
-    real_path = make_real_path(filepath)
+    def invoke(self, **kwargs) -> dict:
+        filepath = kwargs.get("filepath", "")
 
-    if _is_blocked_path(real_path):
-        return {"status": "failure", "message": f"{real_path} is not allowed."}
+        try:
+            real_path = guarded_path(filepath, require_workspace=False)
+        except ToolError as e:
+            return err(str(e))
 
-    result = os.path.exists(real_path)
+        if not os.path.exists(real_path):
+            return err(f"Path does not exist: {real_path}")
 
-    return {"status": "ok", "result": result}
+        entries = [name for name in os.listdir(real_path) if name not in ("..", ".")]
+
+        return ok(entries)
+
+
+class FileExistsTool(BaseTool):
+    name = "file_exists"
+    description = "Checks if the file exists specified by the filepath."
+    parameters = {
+        "type": "object",
+        "properties": {
+            "filepath": {
+                "type": "string",
+                "description": "filepath. parent relative paths will be resolved automatically.",
+            }
+        },
+        "required": ["filepath"],
+    }
+
+    def invoke(self, **kwargs) -> dict:
+        filepath = kwargs.get("filepath", "")
+
+        try:
+            real_path = guarded_path(filepath, require_workspace=False)
+        except ToolError as e:
+            return err(str(e))
+
+        return ok(os.path.exists(real_path))

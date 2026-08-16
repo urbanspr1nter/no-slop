@@ -149,7 +149,7 @@ async def stream_message(client: openai.AsyncClient, context: list):
 
                 arguments = json.loads(tool_call["arguments"])
 
-                result = call_tool(name, arguments)
+                result = call_tool(name, tool_call["call_id"], arguments)
 
                 context.append(
                     {

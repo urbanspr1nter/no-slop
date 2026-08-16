@@ -1,75 +1,106 @@
 import math
 
+from tools.base_tool import BaseTool
+from tools.helpers import err, ok
 
-def sqrt(x: float) -> float:
-    """Returns the square root of a given number.
+_BINARY_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "x": {"type": "number", "description": "The first operand."},
+        "y": {"type": "number", "description": "The second operand."},
+    },
+    "required": ["x", "y"],
+}
 
-    Output:
-        - float: square root of the number
+
+class MathTool(BaseTool):
+    """Shared implementation for the small math tools.
+
+    Subclasses supply ``name``, ``description``, ``parameters`` and a
+    ``func``. Errors (e.g. taking a square root of a negative number or a
+    division by zero) are converted into error envelopes instead of raising.
     """
 
-    return math.sqrt(x)
+    func = staticmethod(lambda *args: args[0])
+    arity = 1
+
+    def invoke(self, **kwargs) -> dict:
+        if self.arity == 1:
+            args = [kwargs.get("x", 0)]
+        else:
+            args = [kwargs.get("x", 0), kwargs.get("y", 0)]
+
+        try:
+            result = self.func(*args)
+        except (ValueError, ZeroDivisionError, OverflowError) as e:
+            return err(f"Could not compute result: {e}.")
+
+        return ok(result)
 
 
-def sum(x: float, y: float) -> float:
-    """Returns the sum of 2 numbers.
-
-    Output:
-        - float: sum of 2 numbers
-    """
-
-    return x + y
-
-
-def sub(x: float, y: float) -> float:
-    """Returns the difference between 2 numbers.
-
-    Output:
-        - float: difference between 2 numbers
-    """
-
-    return x - y
+class SqrtTool(MathTool):
+    name = "sqrt"
+    description = "Computes the square root of a given number."
+    parameters = {
+        "type": "object",
+        "properties": {
+            "x": {
+                "type": "number",
+                "description": "The number you want to square root.",
+            }
+        },
+        "required": ["x"],
+    }
+    arity = 1
+    func = staticmethod(math.sqrt)
 
 
-def mult(x: float, y: float) -> float:
-    """Returns the product of 2 numbers.
-
-    Output:
-        - float: product of 2 numbers.
-    """
-
-    return x * y
+class SumTool(MathTool):
+    name = "sum"
+    description = "Computes the sum of 2 numbers."
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x + y)
 
 
-def div(x: float, y: float) -> float:
-    """Returns the quotient of 2 numbers.
-
-    Output:
-        - float: quotient of 2 numbers.
-    """
-
-    try:
-        return x / y
-    except ZeroDivisionError as z:
-        print(f"Division by 0 error. Attempted to divide by: {y}")
-        raise z
+class SubTool(MathTool):
+    name = "sub"
+    description = "Computes the difference between 2 numbers."
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x - y)
 
 
-def pow(x: float, y: float) -> float:
-    """Raises a number x to the power of y.
-
-    Output:
-        - float: x to the power of y
-    """
-
-    return x**y
+class MultTool(MathTool):
+    name = "mult"
+    description = "Computes the product between 2 numbers."
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x * y)
 
 
-def mod(x: float, y: float) -> float:
-    """Computes modulo of x and y.
+class DivTool(MathTool):
+    name = "div"
+    description = (
+        "Computes the quotient between 2 numbers. Raises a ZeroDivisionError if "
+        "attempting to divide by 0."
+    )
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x / y)
 
-    Output:
-        - float: result of x mod y
-    """
 
-    return x % y
+class PowTool(MathTool):
+    name = "pow"
+    description = "Computes x raised to y power."
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x**y)
+
+
+class ModTool(MathTool):
+    name = "mod"
+    description = "Computes the modulo between 2 numbers."
+    parameters = _BINARY_SCHEMA
+    arity = 2
+    func = staticmethod(lambda x, y: x % y)

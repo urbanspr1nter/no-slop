@@ -60,7 +60,7 @@ def send_message(prompt: str) -> str:
                 )
                 print(tool_call_trace)
 
-                result = call_tool(tool_name, args)
+                result = call_tool(item.name, item.call_id, args)
 
                 context.append(
                     {

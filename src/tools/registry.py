@@ -1,327 +1,69 @@
-FILE_SYSTEM_TOOLS = [
-    {
-        "type": "function",
-        "name": "write_file",
-        "description": "Writes a file with contents given a filepath. Can only write within the workspace directory.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "filepath": {
-                    "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically. path must include the workspace directory.",
-                },
-                "content": {
-                    "type": "string",
-                    "description": "contents to write to the file",
-                },
-                "mode": {
-                    "type": "string",
-                    "description": "file operation mode. default: 'w'.",
-                },
-            },
-            "required": ["filepath", "content"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "read_file",
-        "description": "Reads a file and gets contents as a string given the filepath.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "filepath": {
-                    "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically.",
-                },
-                "mode": {
-                    "type": "string",
-                    "description": "file operation mode. default: 'r'.",
-                },
-            },
-            "required": ["filepath"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "make_directory",
-        "description": "Creates a directory at the filepath. Can only create directories within the workspace directory.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "filepath": {
-                    "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically. path must include the workspace directory.",
-                },
-                "create_parent_if_not_exists": {
-                    "type": "boolean",
-                    "description": "Create all parent directories if true. Default false.",
-                },
-            },
-            "required": ["filepath"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "list_directory",
-        "description": "Gets the filenames at the current directory specified by the filepath.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "filepath": {
-                    "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically.",
-                }
-            },
-            "required": ["filepath"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "file_exists",
-        "description": "Checks if the file exists specified by the filepath.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "filepath": {
-                    "type": "string",
-                    "description": "filepath. parent relative paths will be resolved automatically.",
-                }
-            },
-            "required": ["filepath"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "glob",
-        "description": "Perform glob path search at the start path. Optionally recurse.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "start_path": {
-                    "type": "string",
-                    "description": "Start path which will resolve to the absolute path to begin glob search",
-                },
-                "glob_path": {"type": "string", "description": "glob path"},
-                "recurse": {"type": "boolean", "description": "Recurse search"},
-            },
-            "required": ["start_path", "glob_path"],
-        },
-    },
+"""Tool registry.
+
+Every tool is a :class:`tools.base_tool.BaseTool` subclass. The OpenAI function
+schemas sent to the model are derived from the tool classes themselves, so a
+tool's schema and its implementation can never drift apart (previously both
+were maintained by hand in two different places).
+"""
+
+from tools.base_tool import BaseTool
+from tools.file_edit_and_show_diff import FileEditAndShowDiffTool
+from tools.fs import (
+    FileExistsTool,
+    ListDirectoryTool,
+    MakeDirectoryTool,
+    ReadFileTool,
+    WriteFileTool,
+)
+from tools.glob_tool import GlobTool
+from tools.ns_math import (
+    DivTool,
+    ModTool,
+    MultTool,
+    PowTool,
+    SqrtTool,
+    SubTool,
+    SumTool,
+)
+from tools.shell import ShellExecSyncTool
+from tools.web_search_and_scrape import WebPageScrapeTool, WebSearchTool
+
+FILE_SYSTEM_TOOLS: list[BaseTool] = [
+    WriteFileTool(),
+    ReadFileTool(),
+    MakeDirectoryTool(),
+    ListDirectoryTool(),
+    FileExistsTool(),
+    GlobTool(),
 ]
 
-MATH_TOOLS = [
-    {
-        "type": "function",
-        "name": "sqrt",
-        "description": "Computes the square root of a given number.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The number you want to square root.",
-                }
-            },
-            "required": ["x"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "sum",
-        "description": "Computes the sum of 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "sub",
-        "description": "Computes the difference between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "mult",
-        "description": "Computes the product between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "div",
-        "description": "Computes the quotient between 2 numbers. Raises a ZeroDivisionError if attempting to divide by 0.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "pow",
-        "description": "Computes x raised to y power.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "mod",
-        "description": "Computes the modulo between 2 numbers.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "The first operand.",
-                },
-                "y": {"type": "number", "description": "The second operand."},
-            },
-            "required": ["x", "y"],
-        },
-    },
+MATH_TOOLS: list[BaseTool] = [
+    SqrtTool(),
+    SumTool(),
+    SubTool(),
+    MultTool(),
+    DivTool(),
+    PowTool(),
+    ModTool(),
 ]
 
-SHELL_TOOLS = [
-    {
-        "type": "function",
-        "name": "shell_exec_sync",
-        "description": 'Run a shell command synchronously. Parameters are "program" (string) and "arguments" (array). Example: program="ls" arguments=["-la", "/etc/"]',
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "program": {
-                    "type": "string",
-                    "description": "Program or builtin to run.",
-                },
-                "arguments": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "List of arguments including the switches and options. Pass as literally array of strings.",
-                },
-                "env": {
-                    "type": "object",
-                    "additionalProperties": {"type": "string"},
-                    "description": "Environment variables to set (key-value pairs). OS environment will be extended with this.",
-                },
-                "timeout": {
-                    "type": "number",
-                    "description": "Maximum number of seconds to execute the shell command. Default=120 seconds if not provided.",
-                },
-            },
-            "required": ["program"],
-        },
-    }
+SHELL_TOOLS: list[BaseTool] = [ShellExecSyncTool()]
+
+EDITING_TOOLS: list[BaseTool] = [FileEditAndShowDiffTool()]
+
+WEB_TOOLS: list[BaseTool] = [WebSearchTool(), WebPageScrapeTool()]
+
+#: All tool instances, in schema order.
+ALL_TOOLS: list[BaseTool] = [
+    *FILE_SYSTEM_TOOLS,
+    *MATH_TOOLS,
+    *SHELL_TOOLS,
+    *EDITING_TOOLS,
+    *WEB_TOOLS,
 ]
 
-EDITING_TOOLS = [
-    {
-        "type": "function",
-        "name": "file_edit_and_show_diff",
-        "description": "Edits a file on disk given the string to replace with the new string. Returns a diff of edits after the process is done.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "old_str": {
-                    "type": "string",
-                    "description": "String to search for in the file to be replaced for edit.",
-                },
-                "new_str": {
-                    "type": "string",
-                    "description": "String to replace the old_str.",
-                },
-                "filepath": {
-                    "type": "string",
-                    "description": "Filepath of the file to edit.",
-                },
-            },
-            "required": ["old_str", "new_str", "filepath"],
-        },
-    }
-]
+#: name -> tool instance, used by the dispatch layer (call_tool).
+TOOLS: dict[str, BaseTool] = {tool.name: tool for tool in ALL_TOOLS}
 
-WEB_TOOLS = [
-    {
-        "type": "function",
-        "name": "web_search",
-        "description": "Performs a web search given a query. Optionally, provide a search results limit. Default limit is 10 results. Returns a markdown string respresentation of all the search results with each result formatted with TITLE, DESCRIPTION and URL.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Query to search the web for related content.",
-                },
-                "limit": {
-                    "type": "number",
-                    "description": "Number of results to return. Default is 10.",
-                },
-            },
-            "required": ["query"],
-        },
-    },
-    {
-        "type": "function",
-        "name": "web_page_scrape",
-        "description": "Scrapes a web page for contents given a URL. Returns the markdown representation of the web page.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "url": {
-                    "type": "string",
-                    "description": "Web page URL to scrape contents.",
-                }
-            },
-            "required": ["url"],
-        },
-    },
-]
-
-
-TOOL_SET = []
-TOOL_SET.extend(FILE_SYSTEM_TOOLS)
-TOOL_SET.extend(MATH_TOOLS)
-TOOL_SET.extend(SHELL_TOOLS)
-TOOL_SET.extend(EDITING_TOOLS)
-TOOL_SET.extend(WEB_TOOLS)
+#: The OpenAI function schemas sent to the model with every request.
+TOOL_SET: list[dict] = [tool.to_schema() for tool in ALL_TOOLS]
