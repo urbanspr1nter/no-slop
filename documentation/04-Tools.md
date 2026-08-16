@@ -21,7 +21,7 @@ graph LR
     Agent[StreamingAgent] -->|tool name + args| CallTool[call_tool.py]
     CallTool -->|lookup by name| Registry[registry.py: TOOLS]
     Registry -->|schema list| LLM[tools sent to the model]
-    CallTool -->|tool.run()| Tool[BaseTool subclass]
+    CallTool -->|execute safely| Tool[BaseTool subclass]
     Tool -->|ok/err envelope| Agent
     Tool -. path checks .-> Helpers[helpers.py]
     Tool -. truncate / log .-> Truncate[truncate_with_label.py]
