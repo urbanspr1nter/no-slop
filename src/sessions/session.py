@@ -39,6 +39,10 @@ class Session:
             self._session_data["created_time_ts"] = contents_json["created_time_ts"]
             self._session_data["updated_time_ts"] = contents_json["updated_time_ts"]
 
+    @property
+    def id(self) -> str:
+        return self._session_id
+
     def save(self, context: list):
         self._session_data["context"] = context
         self._session_data["updated_time_ts"] = int(time.time() * 1000)

@@ -20,7 +20,8 @@ Guidance for AI coding agents working in this repository. Read this before touch
 ## Architecture
 
 ```
-interface.streaming_client  CLI prompt loop (prompt_toolkit)
+interface.streaming_client    entry: curses TUI (interactive) / headless (-p)
+  ├─ interface.curses_tui      curses UI: scrolling message pane + growing input box
   └─ orchestrator.streaming_agent   StreamingAgent.step() — stream → tool exec loop
        ├─ intelligence_layer        Responses API client (stream / non-stream)
        ├─ context_management        in-memory context
@@ -41,10 +42,10 @@ Imports are top-level against `src/` (e.g. `from orchestrator.streaming_agent im
 
 ## Gotchas
 
-- The interactive `?` prompt uses prompt_toolkit multiline: **submit with Escape+Enter**, not Enter (Enter inserts a newline). A clean fix is a planned interface refactor; until then do not "fix" it piecemeal.
+- The interactive UI is `interface/curses_tui.py`, stdlib `curses` only — **no TUI framework**. The owner explicitly wants no heavy libraries; do not reintroduce prompt_toolkit/textual. `src/helpers/prompt_tk_test.py` and the `textual_*.py` files are dead experiments from the old UI. See `documentation/05-TUI.md`.
 - Starting a new server does not update anything here — this is a TUI app, not a web service. There is no HMR of any kind.
-- There is no real test suite: `src/helpers/*_test.py` are ad-hoc scripts. `src/helpers/smoke_test.py` is the closest thing to a fast sanity check.
-- `documentation/` is a numbered series (01..04). Match its terse note style.
+- There is no real test suite: `src/helpers/*_test.py` are ad-hoc scripts. `src/helpers/smoke_test.py` is the closest thing to a fast sanity check; `src/helpers/tui_test.py` additionally runs the curses TUI under a PTY with a fake streaming agent (headless logic tests + e2e screen assertions, with a bounded retry for PTY timing).
+- `documentation/` is a numbered series (01..05). Match its terse note style.
 - Git: commit with the repo-local identity already configured. Public repo — run a quick scan for secrets before committing anything credential-adjacent.
 
 ## Conventions
