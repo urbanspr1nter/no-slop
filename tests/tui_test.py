@@ -8,7 +8,7 @@ the test rebuilds the screen with a minimal VT grid emulator
 (MiniScreen) and asserts on the final screen state, while a few
 contiguous single-write markers are checked in stream order.
 
-Run:  .venv/bin/python src/helpers/tui_test.py
+Run:  .venv/bin/python tests/tui_test.py
 """
 
 import fcntl
@@ -22,7 +22,7 @@ import termios
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "..")
+SRC = os.path.join(HERE, "..", "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
 

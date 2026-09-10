@@ -44,7 +44,7 @@ Event contract (dicts pushed by the agent's renderer hook):
 
 The wrapping / input / pane logic below (wrap_spans, TextInput, MessagePane)
 is pure Python and has no curses dependency, so it can be exercised
-headless (see src/helpers/tui_test.py).
+headless (see tests/tui_test.py).
 """
 
 import asyncio
