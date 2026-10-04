@@ -45,10 +45,7 @@ Need up-front, the necessary documentation to get myself going so I don't burn t
 # Installation
 
 ```
-# Install setuptools
-pip install -r requirements
-
-# Install the all other requirements and our project in editable mode
+# Install the project (and its dependencies) in editable mode
 pip install -e .
 ```
 
