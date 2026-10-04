@@ -24,14 +24,27 @@ def get_platform_information():
         "machine_arch": platform.machine(),
         "platform": platform.platform(),
     }
-    if platform.freedesktop_os_release():
-        info = dict(platform.freedesktop_os_release())
 
-        result = {
-            **result,
-            "distribution_name": info["NAME"],
-            "version": info["VERSION"],
-        }
+    system = platform.system()
+
+    if system == "Linux":
+        # /etc/os-release. Unreadable on macOS/Windows and absent on some
+        # minimal installs, so absence is tolerated rather than fatal.
+        try:
+            info = dict(platform.freedesktop_os_release())
+        except (OSError, KeyError):
+            info = {}
+
+        result["distribution_name"] = info.get("NAME", "Linux")
+        result["version"] = info.get("VERSION", info.get("VERSION_ID", ""))
+    elif system == "Darwin":
+        version, _, _ = platform.mac_ver()
+        result["distribution_name"] = "macOS"
+        result["version"] = version or platform.release()
+    elif system == "Windows":
+        release, version, _, _ = platform.win32_ver()
+        result["distribution_name"] = "Windows"
+        result["version"] = version or release
 
     return result
 
