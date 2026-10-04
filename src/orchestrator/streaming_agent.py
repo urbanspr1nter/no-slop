@@ -152,7 +152,7 @@ class StreamingAgent:
                 self._emit({"type": "response_start"})
 
                 stream_response = await self._intelligence.send_message(
-                    self._context_manager.get_context(), should_stream=True
+                    self._context_manager.get_context()
                 )
 
                 tool_call_queue = []

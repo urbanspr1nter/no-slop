@@ -46,7 +46,6 @@ async def main():
     parser.add_argument("-w", "--workspace")
     parser.add_argument("--session-resume")
     parser.add_argument("-p", "--prompt")
-    parser.add_argument("-t")
 
     args = parser.parse_args()
 
@@ -58,7 +57,7 @@ async def main():
                     system_prompt = f.read()
             else:
                 system_prompt = args.system_prompt
-        except:
+        except Exception:
             system_prompt = args.system_prompt
 
     if args.workspace:
