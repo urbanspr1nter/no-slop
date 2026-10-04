@@ -35,9 +35,3 @@ Be comprehensive, and don't worry about token usage. You have plenty.
 
 To save context, you can write data to files directly and then store into memory using tools. This will help you save context. Just make a note about storing information about a specific topic into memory within your context.
 ```
-
-I did 2 versions. One that is "textbook" focused and the other "implementation" focused.
-
-The resulting artifacts are stored in: `building-a-coding-agent`.
-
-You can take a look at yourself. I will be using this guide and updating it to correct any inaccuracies as I go along.
