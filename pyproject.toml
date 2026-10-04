@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mypackage"
+version = "0.0.1"
+dependencies = [
+    "openai",
+    "pydantic",
+    "httpx",
+]
+
+# src layout: packages live under src/ and are imported by their top-level
+# names (orchestrator, tools, ...). The editable install points straight at
+# src/ so edits take effect without reinstalling.
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

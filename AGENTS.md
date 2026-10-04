@@ -14,8 +14,8 @@ Guidance for AI coding agents working in this repository. Read this before touch
 
 - `./install.sh` creates `.venv` and installs. On Debian/Ubuntu, `python3 -m venv` may lack `ensurepip`; if so, create with `--without-pip` and bootstrap pip via `get-pip.py` (or `sudo apt install python3-venv`).
 - Every command runs through `.venv/bin/python` — never bare `python`.
-- `pip install -r requirements.txt` then `pip install -e .` (package name is `mypackage`; sources live under `src/`).
-- **Keep `httpx` in `setup.py` `install_requires`.** The web tools import it, and `openai` 3.x has its own forked `httpx2`, so it is not installed transitively — dropping it breaks every import.
+- `pip install -e .` installs the package and its dependencies, all declared in `pyproject.toml` (src-layout; package name is `mypackage`; sources live under `src/`). The editable install is what makes the top-level imports resolve — a plain `pip install .` copies the sources into site-packages and edits to `src/` silently stop taking effect.
+- **Keep `httpx` in `pyproject.toml` dependencies.** The web tools import it, and `openai` 3.x has its own forked `httpx2`, so it is not installed transitively — dropping it breaks every import.
 
 ## Architecture
 
